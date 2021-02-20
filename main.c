@@ -8,7 +8,11 @@
 #define ESCRITURA "W"
 #define LECTURA "R"
 
-void procesar_comando(const char* operacion, const char* direccion, const char* tamanio, const char* datos) {
+void procesar_comando(char** parametros) {
+	char* operacion = parametros[1];
+    char* direccion = parametros[2];
+    int tamanio = atoi(parametros[3]);
+    char* datos = parametros[4];
 	
 }
 
@@ -27,7 +31,7 @@ void procesar_entrada(FILE* archivo_de_trazas) {
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros[1], parametros[2], parametros[3], parametros[4]);
+		procesar_comando(parametros);
 		free_strv(parametros);
 		free_strv(campos);
 	}
@@ -54,6 +58,7 @@ int main(int argc, char** argv) {
         printf(ERR_ARCH_TRAZAS);
         return 1;
     }
+	
     
     procesar_entrada(archivo_trazas);
     fclose(archivo_trazas);
