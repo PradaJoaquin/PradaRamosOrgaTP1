@@ -10,10 +10,8 @@ typedef struct bloque
 {
 	bool es_valido;  //se activa cuando se realiza una escritura por primera vez en ese set/tag.
 	bool dirty_bit; //se activa cuando se produce un miss y se realiza una escritura.
-	size_t set;    //indica la fila.
 	size_t tag;   //identifica el bloque.
-	size_t instruccion_actual;
-	void* datos; //la unidad minima es de 2 bytes, = void dato[tope];
+	void* data; //la unidad minima es de 2 bytes, = void dato[tope];
 }bloque_t;
 
 typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
