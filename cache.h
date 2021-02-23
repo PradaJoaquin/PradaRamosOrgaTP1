@@ -18,9 +18,15 @@ typedef struct bloque
 
 typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
 {
-	size_t cantidad_sets; 	// parametro "S".
-	bloque_t* sets; 	   // = bloque_t bloques[], cantidad de bloques = "E". 
+    size_t E; // Cantidad de bloques = "E"
+	bloque_t* bloques; 	   // = bloque_t bloques[]
 }set_t;
+
+typedef struct cache
+{
+    size_t S; // Parametro "S"
+    set_t* sets;
+}cache_t;
 
 typedef struct estadisticas
 {
