@@ -16,7 +16,6 @@ void procesar_comando(char** parametros) {
 	
 }
 
-
 void eliminar_fin_linea(char* linea) {
 	size_t len = strlen(linea);
 	if (linea[len - 1] == '\n') {

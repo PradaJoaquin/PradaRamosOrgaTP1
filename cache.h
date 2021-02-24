@@ -6,25 +6,9 @@
 #define HIT 1
 #define PENALTY 100 //o 101 con el siguiente HIT. 
 
-typedef struct bloque
-{
-	bool es_valido;  //se activa cuando se realiza una escritura por primera vez en ese set/tag.
-	bool dirty_bit; //se activa cuando se produce un miss y se realiza una escritura.
-	size_t tag;   //identifica el bloque.
-	void* data; //la unidad minima es de 2 bytes, = void dato[tope];
-}bloque_t;
-
-typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
-{
-    size_t E; // Cantidad de bloques = "E"
-	bloque_t* bloques; 	   // = bloque_t bloques[]
-}set_t;
-
-typedef struct cache
-{
-    size_t S; // Parametro "S"
-    set_t* sets;
-}cache_t;
+typedef struct bloque bloque_t;
+typedef struct set set_t;
+typedef struct cache cache_t;
 
 typedef struct estadisticas
 {
