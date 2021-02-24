@@ -6,8 +6,6 @@
 #define HIT 1
 #define PENALTY 100 //o 101 con el siguiente HIT. 
 
-typedef struct bloque bloque_t;
-typedef struct set set_t;
 typedef struct cache cache_t;
 
 typedef struct estadisticas
