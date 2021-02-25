@@ -2,6 +2,13 @@
 #include <stdio.h>
 #include "cache.h"
 
+typedef struct addr
+{
+	int tag;
+	int index;
+	int off;
+}addr_t;
+
 typedef struct bloque
 {
 	bool es_valido;  //se activa cuando se realiza una escritura por primera vez en ese set/tag.
