@@ -18,6 +18,7 @@ typedef struct set //fila de bloques, la cantidad de bloques queda definida por 
 
 struct cache
 {
+    int time; // Se usa para el last recently used, numero de operacion actual. 
     size_t S; // Parametro "S" cantidad de sets
     set_t* sets;
 };
