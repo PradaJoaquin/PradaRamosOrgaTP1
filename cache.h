@@ -2,7 +2,7 @@
 #define __CACHE_H__ 
 #include <stdbool.h>
 #include <stdio.h>
-
+/*
 #define HIT 1
 #define PENALTY 100 //o 101 con el siguiente HIT. 
 
@@ -19,6 +19,7 @@ typedef struct estadisticas
 	size_t rmiss;	   //rmiss + wmiss = total miss.
 	size_t wmiss;
 }estadisticas_t;
+*/
 
 //bytes written = (escrituras + wmiss) * unidad_datos.
 //bytes read = (lecturas + rmiss) * unidad_datos.
