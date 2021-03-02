@@ -31,6 +31,35 @@ typedef struct argumentos{
 	int fin;
 }argumentos_t;
 
+void procesar_comando(char** parametros, simulador_t* sim) {
+	char* operacion = parametros[1];
+    size_t direccion = strtoul(parametros[2], NULL, 16);
+    int tamanio = atoi(parametros[3]);
+    size_t datos = strtoul(parametros[4], NULL, 16);
+	
+}
+
+void eliminar_fin_linea(char* linea) {
+	size_t len = strlen(linea);
+	if (linea[len - 1] == '\n') {
+		linea[len - 1] = '\0';
+	}
+}
+
+void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
+	char* linea = NULL;
+	size_t c = 0;
+	while (getline(&linea, &c, archivo_de_trazas) > 0) {
+		eliminar_fin_linea(linea);
+		char** campos = split(linea, ':');
+		char** parametros = split(campos[1], ' ');
+		procesar_comando(parametros);
+		free_strv(parametros);
+		free_strv(campos);
+	}
+	free(linea);
+}
+
 bool es_potencia_de_2(double numero) {
 	return (size_t)log2(numero) % 1 == 0;
 } 
@@ -65,35 +94,6 @@ bool argumentos_verificar(int argc, char** argv){
 	return true;
 }
 
-void procesar_comando(char** parametros) {
-	char* operacion = parametros[1];
-    size_t direccion = strtoul(parametros[2], NULL, 16);
-    int tamanio = atoi(parametros[3]);
-    size_t datos = strtoul(parametros[4], NULL, 16);
-	
-}
-
-void eliminar_fin_linea(char* linea) {
-	size_t len = strlen(linea);
-	if (linea[len - 1] == '\n') {
-		linea[len - 1] = '\0';
-	}
-}
-
-void procesar_entrada(FILE* archivo_de_trazas) {
-	char* linea = NULL;
-	size_t c = 0;
-	while (getline(&linea, &c, archivo_de_trazas) > 0) {
-		eliminar_fin_linea(linea);
-		char** campos = split(linea, ':');
-		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros);
-		free_strv(parametros);
-		free_strv(campos);
-	}
-	free(linea);
-}
-
 int main(int argc, char** argv) {
 	if(!argumentos_verificar(argc, argv)){
 		return 1;
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
 
 	simulador_t* sim = simulador_crear(args.tam_cache, args.asociatividad, args.num_sets, args.modo_verboso, args.ini, args.fin);
     
-    procesar_entrada(archivo_trazas);
+    procesar_entrada(archivo_trazas, sim);
     fclose(archivo_trazas);
 	return 0;
 }
