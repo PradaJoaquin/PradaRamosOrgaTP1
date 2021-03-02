@@ -38,8 +38,10 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
         sim->modo_verb_restante--;
     }
 
+    // Aca se deberian actualizar las estadisticas totales con lo que devuelva cache_operar
+
 }
 
 void simulador_modo_verboso(op_result_t* result){
-    
+    // Aca se recibe el struct que devuelve cache con todos las estadisticas suficientes para imprimir el modo verboso.
 }

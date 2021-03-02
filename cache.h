@@ -27,4 +27,6 @@ typedef struct estadisticas
 
 cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
 
+op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size_t datos);
+
 #endif
