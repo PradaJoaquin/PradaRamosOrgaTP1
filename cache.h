@@ -24,4 +24,7 @@ typedef struct estadisticas
 //bytes read = (lecturas + rmiss) * unidad_datos.
 //miss rate = total miss / (lecturas + escrituras).
 //capacidad cache = S x E x Unidad Datos.
+
+cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
+
 #endif
