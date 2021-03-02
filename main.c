@@ -102,9 +102,14 @@ int main(int argc, char** argv) {
 	args.tam_cache = atoi(argv[tam_cache]);
 	args.asociatividad = atoi(argv[asociatividad]);
 	args.num_sets = atoi(argv[num_sets]);
-	args.modo_verboso = argv[modo_verboso];
-	args.ini = atoi(argv[ini]);
-	args.fin = atoi(argv[fin]);
+	args.modo_verboso = NULL;
+	args.ini = 0;
+	args.fin = 0;
+	if(argc == 8){
+		args.modo_verboso = argv[modo_verboso];
+		args.ini = atoi(argv[ini]);
+		args.fin = atoi(argv[fin]);
+	}
 
     FILE* archivo_trazas = fopen(argv[ruta], "r");
     if (!archivo_trazas){
@@ -112,9 +117,10 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-	simulador_t* sim = simulador_crear(args.tam_cache, args.asociatividad, args.num_sets, args.modo_verboso, args.ini, args.fin);
+	simulador_t* sim = simulador_crear(args.tam_cache, args.asociatividad, args.num_sets, args.ini, args.fin);
     
     procesar_entrada(archivo_trazas, sim);
+	simulador_destruir(sim);
     fclose(archivo_trazas);
 	return 0;
 }

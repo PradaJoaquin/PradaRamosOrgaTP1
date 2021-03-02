@@ -11,7 +11,7 @@ struct simulador
     size_t modo_verb_restante;
 };
 
-simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_t cache_sets, char* modo_verboso, size_t ini, size_t fin){
+simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_t cache_sets, size_t ini, size_t fin){
     simulador_t* sim = malloc(sizeof(simulador_t));
     if(!sim){
         return NULL;
@@ -21,13 +21,13 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
         free(sim);
         return NULL;
     }
-    if(modo_verboso){
-        sim->modo_verb_restante = fin - ini;
-    }else{
-        sim->modo_verb_restante = 0;
-    }
-
+    sim->modo_verb_restante = fin - ini;
     return sim;
+}
+
+void simulador_destruir(simulador_t* sim){
+    cache_destruir(sim->cache);
+    free(sim);
 }
 
 void simulador_modo_verboso(op_result_t* result){

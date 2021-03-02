@@ -43,21 +43,33 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets){
         free(cache);
         return NULL;
     }
+    int k = 0;
     for(int i = 0; i < num_sets; i++){
         cache->sets[i].E = asociatividad;
         cache->sets[i].bloques = malloc(sizeof(bloque_t) * asociatividad);
         if(!cache->sets[i].bloques){
+            for(int j = 0; j < i; j++){
+                for(int q = 0; q < k; q++){
+                    free(cache->sets[j].bloques[q].data);
+                }
+                free(cache->sets[j].bloques);
+            }  
             free(cache->sets);
             free(cache);
             return NULL;
         }
-        for(int k = 0; k < asociatividad; k++){
+        for(k = 0; k < asociatividad; k++){
             cache->sets[i].bloques[k].es_valido = 0;
             cache->sets[i].bloques[k].dirty_bit = 0;
             cache->sets[i].bloques[k].tag = 0;
             cache->sets[i].bloques[k].data = malloc(sizeof(tam_bloque));
             if(!cache->sets[i].bloques[k].data){
-                free(cache->sets->bloques);
+                for(int j = 0; j < i; j++){
+                    for(int q = 0; q < k; q++){
+                        free(cache->sets[j].bloques[q].data);
+                    }
+                    free(cache->sets[j].bloques);
+                }
                 free(cache->sets);
                 free(cache);
                 return NULL;
@@ -65,6 +77,17 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets){
         }
     }
     return cache;
+}
+
+void cache_destruir(cache_t* cache){
+    for(int i = 0; i < cache->S; i++){
+        for(int k = 0; k < cache->sets[i].E; k++){
+            free(cache->sets[i].bloques[k].data);
+        }
+        free(cache->sets[i].bloques);
+    }
+    free(cache->sets);
+    free(cache);
 }
 
 op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size_t datos){
