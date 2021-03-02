@@ -53,7 +53,7 @@ void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros);
+		procesar_comando(parametros, sim);
 		free_strv(parametros);
 		free_strv(campos);
 	}
@@ -61,7 +61,7 @@ void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
 }
 
 bool es_potencia_de_2(double numero) {
-	return (size_t)log2(numero) % 1 == 0;
+	return fmod(log2(numero), 1) == 0;
 } 
 
 bool argumentos_verificar(int argc, char** argv){
