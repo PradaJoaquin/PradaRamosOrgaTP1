@@ -1,7 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "cache.h"
-#include "cacheutil.h"
 
 typedef struct addr
 {

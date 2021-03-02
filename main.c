@@ -10,9 +10,9 @@
 
 void procesar_comando(char** parametros) {
 	char* operacion = parametros[1];
-    char* direccion = strtoul(parametros[2], NULL, 16);
+    size_t direccion = strtoul(parametros[2], NULL, 16);
     int tamanio = atoi(parametros[3]);
-    char* datos = strtoul(parametros[4], NULL, 16);
+    size_t datos = strtoul(parametros[4], NULL, 16);
 	
 }
 

@@ -2,6 +2,7 @@
 #define __CACHE_H__ 
 #include <stdbool.h>
 #include <stdio.h>
+#include "cacheutil.h"
 
 #define HIT 1
 #define PENALTY 100 //o 101 con el siguiente HIT. 

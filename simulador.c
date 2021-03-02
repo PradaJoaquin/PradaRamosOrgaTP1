@@ -30,6 +30,10 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
     return sim;
 }
 
+void simulador_modo_verboso(op_result_t* result){
+    // Aca se recibe el struct que devuelve cache con todos las estadisticas suficientes para imprimir el modo verboso.
+}
+
 void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos){
 
     op_result_t* result = cache_operar(sim->cache, operacion, direccion, tam, datos);
@@ -40,8 +44,4 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
 
     // Aca se deberian actualizar las estadisticas totales con lo que devuelva cache_operar
 
-}
-
-void simulador_modo_verboso(op_result_t* result){
-    // Aca se recibe el struct que devuelve cache con todos las estadisticas suficientes para imprimir el modo verboso.
 }
