@@ -30,4 +30,16 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
     return sim;
 }
 
+void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos){
 
+    op_result_t* result = cache_operar(sim->cache, operacion, direccion, tam, datos);
+    if(sim->modo_verb_restante > 0){
+        simulador_modo_verboso(result);
+        sim->modo_verb_restante--;
+    }
+
+}
+
+void simulador_modo_verboso(op_result_t* result){
+    
+}

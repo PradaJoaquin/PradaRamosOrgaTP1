@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "cache.h"
+#include "cacheutil.h"
 
 typedef struct addr
 {
@@ -67,10 +68,15 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets){
     return cache;
 }
 
-void* cache_leer(cache_t* cache, size_t direccion){
+op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size_t datos){
+    op_result_t* result = malloc(sizeof(op_result_t));
+    if(!result){
+        return NULL;
+    }
 
-}
 
-bool cache_escribir(cache_t* cache, size_t direccion, void* dato){
+    
 
+
+    return result;
 }
