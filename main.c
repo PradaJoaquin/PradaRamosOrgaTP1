@@ -1,12 +1,69 @@
 #define _POSIX_C_SOURCE 200809L
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+#include <math.h>
 
 #include "strutil.h"
 #include "mensajes.h"
+#include "simulador.h"
 
 #define ESCRITURA "W"
 #define LECTURA "R"
+
+enum parametros{
+	_,
+	ruta,
+	tam_cache,
+	asociatividad,
+	num_sets,
+	modo_verboso,
+	ini,
+	fin
+};
+
+typedef struct argumentos{
+	int tam_cache;
+	int asociatividad;
+	int  num_sets;
+	char* modo_verboso;
+	int ini;
+	int fin;
+}argumentos_t;
+
+bool es_potencia_de_2(double numero) {
+	return (size_t)log2(numero) % 1 == 0;
+} 
+
+bool argumentos_verificar(int argc, char** argv){
+	if(argc != 5 && argc != 8){
+		printf(ERR_NUM_ARG);
+		return false;
+	}
+	if(!isdigit_strutil(argv[tam_cache]) || !isdigit_strutil(argv[asociatividad]) || !isdigit_strutil(argv[num_sets])){
+		printf(ERR_NO_DIGIT_CACHE);
+		return false;
+	}
+	if(!es_potencia_de_2(atof(argv[tam_cache])) || !es_potencia_de_2(atof(argv[asociatividad])) || !es_potencia_de_2(atof(argv[num_sets]))){
+		printf(ERR_POT_2);
+		return false;
+	}
+	if(argc == 8){
+		if(strcmp("-v", argv[modo_verboso]) != 0){
+			printf(ERR_PAR_MODO_VER);
+			return false;
+		}
+		if(!isdigit_strutil(argv[ini]) || !isdigit_strutil(argv[fin])){
+			printf(ERR_NO_DIGIT_MODO_VER);
+			return false;
+		}
+		if(0 > atoi(argv[ini]) || atoi(argv[ini]) > atoi(argv[fin])){
+			printf(ERR_NUM_MODO_VER);
+			return false;
+		}
+	}
+	return true;
+}
 
 void procesar_comando(char** parametros) {
 	char* operacion = parametros[1];
@@ -38,26 +95,24 @@ void procesar_entrada(FILE* archivo_de_trazas) {
 }
 
 int main(int argc, char** argv) {
-    // argv[1]: Archivo de traza
-    // argv[2]: Tamaño en bytes
-    // argv[3]: Asociatividad
-    // argv[4]: Numero de sets
-
-    // argv[5]: Modo verboso 
-    // argv[6]: Inicio de rango
-    // argv[7]: Fin de rango
-
-	if(argc != 5 && argc != 8){
-		printf(ERR_NUM_ARG);
+	if(!argumentos_verificar(argc, argv)){
 		return 1;
 	}
+	argumentos_t args;
+	args.tam_cache = atoi(argv[tam_cache]);
+	args.asociatividad = atoi(argv[asociatividad]);
+	args.num_sets = atoi(argv[num_sets]);
+	args.modo_verboso = argv[modo_verboso];
+	args.ini = atoi(argv[ini]);
+	args.fin = atoi(argv[fin]);
 
-    FILE* archivo_trazas = fopen(argv[1], "r");
+    FILE* archivo_trazas = fopen(argv[ruta], "r");
     if (!archivo_trazas){
         printf(ERR_ARCH_TRAZAS);
         return 1;
     }
-	
+
+	simulador_t* sim = simulador_crear(args.tam_cache, args.asociatividad, args.num_sets, args.modo_verboso, args.ini, args.fin);
     
     procesar_entrada(archivo_trazas);
     fclose(archivo_trazas);
