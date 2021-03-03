@@ -33,6 +33,35 @@ struct cache
     set_t* sets;
 };
 
+//------------------------------------------------------------------------------------------
+//-----------------EN CONSTRUCCION---------------------------------------------------------
+/*
+*   Dada la cantidad de bloques, crea un vector con los bloques necesarios, inicializados y 
+*   devuelve el puntero al mismo, en caso de fallar devuelve NULL.
+*/
+void destruir_bloques(bloque_t* bloque, size_t tope)
+{
+    for (int i = tope-1; i < 0; --i)
+        free(bloque[i]->data);
+    free(bloque);
+}
+
+bloque_t* crear_bloques(size_t asociatividad, size_t tam_bloque)
+{   
+    bloque_t* bloque = calloc(asociatividad, sizeof(bloque_t)); 
+    if(!bloque) return NULL;
+
+    for (int i = 0; i < asociatividad; ++i)
+    {
+        bloque[i]->data = malloc(tam_bloque); //puede contener basura.
+        if(!bloque[i]->data){                //debo destruir los anteriores.
+            destruir_bloques(bloque, i);
+            return NULL;
+        }else bloque[i]->tag = i; //inicializa el tag, son todos sucesivos van de 0 a i(E -1).
+    }
+    return bloque;
+}
+
 cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets){
     size_t tam_bloque = tam / (asociatividad * num_sets);
 
@@ -41,55 +70,66 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets){
         return NULL;
     }
     cache->S = num_sets;
-    cache->sets = malloc(sizeof(set_t) * num_sets);
+    //cache->sets = malloc(sizeof(set_t) * num_sets);
+    cache->sets = calloc(num_sets, sizeof(set_t)); //asi se inicializa.
     if(!cache->sets){
         free(cache);
         return NULL;
-    }
+    } else cache->S = num_sets;
+
     int k = 0;
-    for(int i = 0; i < num_sets; i++){
-        cache->sets[i].E = asociatividad;
-        cache->sets[i].bloques = malloc(sizeof(bloque_t) * asociatividad);
-        if(!cache->sets[i].bloques){
-            for(int j = 0; j < i; j++){
-                for(int q = 0; q < k; q++){
-                    free(cache->sets[j].bloques[q].data);
-                }
-                free(cache->sets[j].bloques);
-            }  
-            free(cache->sets);
-            free(cache);
+    for(int i = 0; i < num_sets; i++)
+    {
+        cache->sets[i]->E = asociatividad;
+        //cache->sets[i]->bloques = malloc(sizeof(bloque_t) * asociatividad);
+       // cache->sets[i]->bloques = calloc(asociatividad, sizeof(bloque_t)); 
+        cache->sets[i]->bloques = crear_bloques(asociatividad, tam_bloque);
+        if(!cache->sets[i]->bloques){
+            cache_destruir(cache, i); //destruye hasta la posicion indicada.
             return NULL;
-        }
-        for(k = 0; k < asociatividad; k++){
-            cache->sets[i].bloques[k].es_valido = 0;
-            cache->sets[i].bloques[k].dirty_bit = 0;
-            cache->sets[i].bloques[k].tag = 0;
-            cache->sets[i].bloques[k].data = malloc(sizeof(tam_bloque));
+        } //else inicializar_bloques(cache->sets[i]->bloques);
+    /*
+        for(k = 0; k < asociatividad; k++)
+        {
+          //  cache->sets[i]->bloques[k]->es_valido = 0;
+          //  cache->sets[i]->bloques[k]->dirty_bit = 0; //estos valores son 0 por calloc.
+          //  cache->sets[i]->bloques[k]->tag = 0;
+            cache->sets[i]->bloques[k]->data = malloc(sizeof(tam_bloque));
+
             if(!cache->sets[i].bloques[k].data){
-                for(int j = 0; j < i; j++){
-                    for(int q = 0; q < k; q++){
-                        free(cache->sets[j].bloques[q].data);
-                    }
-                    free(cache->sets[j].bloques);
-                }
-                free(cache->sets);
-                free(cache);
+              cache_destruir(cache, k);
                 return NULL;
             }
         }
+    */
     }
     return cache;
 }
 
-void cache_destruir(cache_t* cache){
-    for(int i = 0; i < cache->S; i++){
-        for(int k = 0; k < cache->sets[i].E; k++){
-            free(cache->sets[i].bloques[k].data);
-        }
-        free(cache->sets[i].bloques);
+/*
+*   Desrtuye hasta la posicion indicada por max, si se desea destruir todo, debe pasarse la cantidad de sets.
+**  Se implemento de esta forma para manejar los errores de memoria al crear, optimizando la reutilizacion de codigo.
+*/
+void cache_destruir(cache_t* cache, size_t max){
+    if(!cache) return;
+    if(!cache->sets){
+        free(cache);
+        return;
+    } 
+    int tope = cache->S;
+    if(max < cache->S) tope = max; 
+
+    for(int i = 1; i < tope; i++){
+        if(cache->sets[i]->bloques != NULL)
+        {
+            for(int k = 0; k < cache->sets[i].E; k++){
+                //existen los bloques. ok.
+                free(cache->sets[i]->bloques[k]->data);
+            }
+        }else free(cache->sets[i].bloques);
     }
-    free(cache->sets);
+
+    free(cache->sets); 
     free(cache);
 }
 
@@ -103,29 +143,6 @@ op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size
     return result;
 }
 
-/*
-    typedef struct bloque
-    {
-        bool es_valido;  //se activa cuando se realiza una escritura por primera vez en ese set/tag.
-        bool dirty_bit; //se activa cuando se produce un miss y se realiza una escritura.
-        size_t tag;    //identifica el bloque.
-        void* data;   //la unidad minima es de 2 bytes, = void dato[tope];
-        size_t ins;  //Almacena la instruccion que usa el bloque (la linea del archivo).
-    }bloque_t;
-
-    typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
-    {
-        size_t E;             // Cantidad de bloques = "E"
-        bloque_t* bloques;   // = bloque_t bloques[]
-    }set_t;
-
-    struct cache
-    {
-        int time;  // Se usa para el last recently used, numero de operacion actual. //SE PODRIA SACAR.
-        size_t S; // Parametro "S" cantidad de sets
-        set_t* sets;
-    };
-*/
 
 bloque_t* buscar_menores(bloque_t** bloques, size_t tope)
 {
