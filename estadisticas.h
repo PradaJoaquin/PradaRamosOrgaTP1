@@ -7,13 +7,26 @@
 
 #include <stdio.h>
 
-typedef struct cache cache_t;
+typedef enum resultado = {hit, clean_miss, dirty_rmiss} resultado_t;
+						 //0   ,    1     ,    2
+typedef struct addr addr_t;
+
+typedef struct op_result
+{
+    char operacion; 		// w o r
+    resultado_t resultado; // Hit, clean miss o dirty miss.
+    addr_t direccion;	  // tag, indice?
+    size_t instruccion;  // podemos guardar aca la linea del archivo.
+    bool valido; 		// Indica si se cargo un dato en la memoria o no.
+    bool dirty_bit     // cambia el curso de algunas operaciones.
+}op_result_t;
 
 typedef struct estadisticas
 {
-	size_t lecturas;	    //se contabilizan siempre.
-	size_t escrituras;     //lecturas + escrituras = N instrucciones.
-	size_t clean_miss;    //Se activa cuando dirty bit = 0.
+	size_t lecturas;	     //se contabilizan siempre.
+	size_t escrituras;      //lecturas + escrituras = N instrucciones.
+	size_t rmiss;    	   //Se activa cuando dirty bit = 0.
+	size_t wmiss
 	size_t dirty_rmiss;  //Se contabiliza cuando rmiss + dirty bit = 1.
 	size_t dirty_wmiss; //Se contabiliza cuando wmiss + dirty bit = 1.
 	size_t rmiss;	   //rmiss + wmiss = total miss.
@@ -21,26 +34,18 @@ typedef struct estadisticas
 }estadisticas_t;
 
 /*
-*  bytes written = ((escrituras + wmiss) * unidad_datos)/8. //mal
-*  bytes read = ((lecturas + rmiss) * unidad_datos)/8. //mal
-*  miss rate = total miss / (lecturas + escrituras).
 *  capacidad cache = S x E x Unidad Datos.
-*  bytes read = total misses x tamanio bloque. (tamanio bloque = cache size /(S*E)).
-*  bytes written = (dirty rmiss + dirty wmiss) * tamanio bloque.
-*/
-
-/*penalizaciones (ciclos)
-*
-*   clean miss = 1 + penalty; (clean miss = rmiss + wmiss)
-*   dirty miss = 1 + 2*penalty; (dirty miss = d rmiss + s w miss)
-*  	readtime =  (rmiss + dirty_rmiss) * penalty + lecturas;  (1 lectura = 1 ciclo)
-*  	writetime = (wmiss + dirty wmiss) *  penalty + escrituras;
 */
 
 /*
-* Recibe el tamanio_cache como cantidad de bytes, los sets y la accesibilidad deben estar validados.
-* Imprime y calcula todas las estadisticas relevantes del el archivo:
-*	lectuas, escrituras, clean misses, dirty misses, bytes leidos y bytes escritos.
+*	Recibe la operacion procesada y carga los resultados en la estadistica pasada por parametro.
+*/
+void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result);
+
+/*
+*  Recibe el tamanio_cache como cantidad de bytes, los sets y la accesibilidad deben estar validados.
+*  Imprime y calcula todas las estadisticas relevantes del el archivo:
+*  lectuas, escrituras, clean misses, dirty misses, bytes leidos y bytes escritos.
 */
 void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, size_t tamanio_cache)
 
