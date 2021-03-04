@@ -7,5 +7,6 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
 
 void simulador_destruir(simulador_t* sim);
 
+void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos);
 
 #endif

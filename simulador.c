@@ -44,4 +44,5 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
 
     // Aca se deberian actualizar las estadisticas totales con lo que devuelva cache_operar
 
+    free(result);
 }

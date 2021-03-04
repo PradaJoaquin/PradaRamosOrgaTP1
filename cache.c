@@ -1,12 +1,15 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include "cache.h"
+
+#define TAM_DIRECCION_MEMORIA 32
 
 typedef struct addr
 {
-	int tag;
-	int index;
-	int off;
+	size_t tag;
+	size_t index;
+	size_t off;
 }addr_t;
 
 typedef struct bloque
@@ -90,13 +93,33 @@ void cache_destruir(cache_t* cache){
     free(cache);
 }
 
+addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
+    addr_t addr;
+    addr.off = dir & (block_size - 1);
+    addr.index = (dir >> (int)log2((double)block_size)) & (num_sets - 1);
+    addr.tag = dir >> ((int)log2((double)block_size) + (int)log2((double)num_sets));
+    return addr;
+}
+
 op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size_t datos){
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result){
         return NULL;
     }
+    addr_t addr = addr_crear(dir, sizeof(cache->sets->bloques->data) * 8, cache->S); // Corregir esto despues.. (el sizeof esta mal)
 
+    result->operacion = op;
+    result->direccion = addr;
 
+    set_t set = cache->sets[addr.index];
+    for(int i = 0; i < set.E; i++){
+        if(set.bloques[i].tag == addr.tag){
+            // HIT
+            result->resultado = // HIT
+        }
+    }
+    // MISS
+    bloque_t remplazo = encontrar_LRU(cache); // revisar esta funcion
 
 
 

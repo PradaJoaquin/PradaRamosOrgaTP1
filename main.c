@@ -37,6 +37,7 @@ void procesar_comando(char** parametros, simulador_t* sim) {
     int tamanio = atoi(parametros[3]);
     size_t datos = strtoul(parametros[4], NULL, 16);
 	
+	simulador_operar(sim, operacion, direccion, tamanio, datos);
 }
 
 void eliminar_fin_linea(char* linea) {
