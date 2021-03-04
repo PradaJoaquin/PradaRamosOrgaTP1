@@ -36,10 +36,10 @@ void simulador_modo_verboso(op_result_t* result){
 }
 
 //simulador debe recibir estadisticas si solo hace una operacion a la vez.
-void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos, 
+void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos, size_t instruccion, 
     estadisticas_t* estadisticas){
 
-    op_result_t* result = cache_operar(sim->cache, *operacion, direccion, tam, datos);
+    op_result_t* result = cache_operar(sim->cache, *operacion, direccion, tam, datos, instruccion);
     if(!result) return;
 
     if(sim->modo_verb_restante > 0){

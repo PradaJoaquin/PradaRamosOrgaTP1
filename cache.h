@@ -52,11 +52,6 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
 */
 void cache_destruir(cache_t* cache);
 
-/*
-*   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
-*/
-bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope);
-
-op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos);
+op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos, size_t instruccion);
 
 #endif

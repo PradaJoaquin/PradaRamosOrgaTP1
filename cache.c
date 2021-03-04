@@ -3,7 +3,10 @@
 #include <math.h>
 #include "cache.h"
 
-#define TAM_DIRECCION_MEMORIA 32
+#define BYTE_SIZE 8
+
+#define ESCRITURA 'W'
+#define LECTURA 'R'
 
 typedef struct bloque
 {
@@ -116,19 +119,22 @@ void cache_destruir_hasta(cache_t* cache, size_t tope)
 /*
 *   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
 */
-bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope)
+bloque_t* encontrar_LRU(bloque_t* bloques, size_t tope)
 {
-    size_t ins_menor = bloques[0]->ins; //todas son positivas.
-    size_t pos_menor = 0;
+    size_t ins_menor; //todas son positivas.
+    size_t pos_menor = -1;
 
-    for (size_t i = 1; i < tope; ++i)
+    for (size_t i = 0; i < tope; ++i)
     {
-        if( bloques[i]->ins < ins_menor){
-            ins_menor = bloques[i]->ins; //guardo la menor instruccion.
+        if(!bloques[i].es_valido){ // Si encuentra un bloque no valido, entonces lo devulve
+            return &bloques[i];
+        }
+        if(pos_menor == -1 || bloques[i].ins < ins_menor){
+            ins_menor = bloques[i].ins; //guardo la menor instruccion.
             pos_menor = i;   //guardo el puntero del bloque en el auxiliar.
         }
     }
-    return bloques[pos_menor]; //puntero al bloque.
+    return &bloques[pos_menor]; //puntero al bloque.
 }
 
 addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
@@ -140,25 +146,50 @@ addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
     return addr;
 }
 
-op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos){
+void configurar_remplazo(bloque_t* remplazo, char op, addr_t addr, size_t instruccion){
+    remplazo->es_valido = true;
+    remplazo->tag = addr.tag;
+    remplazo->ins = instruccion;
+    remplazo->dirty_bit = false;
+    if(op == ESCRITURA){
+        remplazo->dirty_bit = true;
+    }
+}
+
+op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos, size_t instruccion){
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result) return NULL;
     
-    addr_t addr = addr_crear(dir, cache->sets->bloques->tam * 8, cache->S); // Corregir esto despues..
+    addr_t addr = addr_crear(dir, cache->sets->bloques->tam * BYTE_SIZE, cache->S);
 
     result->operacion = op;
     result->direccion = addr;
-    /*
+    result->instruccion = instruccion;
+
     set_t set = cache->sets[addr.index];
     for(size_t i = 0; i < set.E; i++){
-        if(set.bloques[i].tag == addr.tag){
+        if(set.bloques[i].es_valido && set.bloques[i].tag == addr.tag){
             // HIT
-            result->resultado = hit; // HIT revisar
+            set.bloques[i].ins = instruccion;
+            if(op == ESCRITURA){
+                set.bloques[i].dirty_bit = true;
+            }
+
+            result->resultado = hit;
+            return result;
         }
     }
     // MISS
-    bloque_t* remplazo = encontrar_LRU(&set.bloques, set.E);
-    */
+    bloque_t* remplazo = encontrar_LRU(set.bloques, set.E);
+    if(!remplazo->es_valido || !remplazo->dirty_bit){
+        // Clean cache miss
+        configurar_remplazo(remplazo, op, addr, instruccion);
+        result->resultado = clean_miss;
+    }else{
+        // Dirty cache miss
+        configurar_remplazo(remplazo, op, addr, instruccion);
+        result->resultado = dirty_miss;
+    }
+
     return result;
 }
-

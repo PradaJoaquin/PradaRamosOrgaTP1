@@ -8,9 +8,6 @@
 #include "mensajes.h"
 #include "simulador.h"
 
-#define ESCRITURA "W"
-#define LECTURA "R"
-
 enum parametros{
 	_,
 	ruta,
@@ -42,7 +39,7 @@ int sig_posision_valida(char** parametros, int actual){
 	return -1;
 }
 
-void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estadisticas) {
+void procesar_comando(char** parametros, char* inst, simulador_t* sim, estadisticas_t* estadisticas) {
 	int pos_operacion = sig_posision_valida(parametros, 0);
 	int pos_direccion = sig_posision_valida(parametros, pos_operacion);
 	int pos_tamanio = sig_posision_valida(parametros, pos_direccion);
@@ -52,8 +49,9 @@ void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estad
     size_t direccion = strtoul(parametros[pos_direccion], NULL, 16);
     int tamanio = atoi(parametros[pos_tamanio]);
     size_t datos = strtoul(parametros[pos_datos], NULL, 16);
+	size_t instruccion = strtoul(inst, NULL, 16);
 	
-	simulador_operar(sim, operacion, direccion, tamanio, datos, estadisticas);
+	simulador_operar(sim, operacion, direccion, tamanio, datos, instruccion, estadisticas);
 }
 
 void eliminar_fin_linea(char* linea) {
@@ -72,7 +70,7 @@ void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros, sim, &estadisticas);
+		procesar_comando(parametros, campos[0], sim, &estadisticas);
 		free_strv(parametros);
 		free_strv(campos);
 	}
