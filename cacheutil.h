@@ -1,16 +1,28 @@
 #ifndef __CACHEUTIL_H__
 #define __CACHEUTIL_H__ 
 
+typedef enum resultados
+{
+    hit,
+    clean_miss,
+    dirty_miss
+}resultados_t;
+
+typedef struct addr
+{
+	int tag;
+	int index;
+	int off;
+}addr_t;
+
 typedef struct op_result
 {
-    //optype: OpType,
-    //result: Lookup, // Hit, clean miss, dirty miss.
-    //addr: Addr,     // Unpacked address (index, tag).
-    //line_num: usize,
-    //valid_bit: u8,
-    //dirty_bit: u8,
-    //prev_tag: Option<u32>,     // Only present if line was valid.
-    //prev_mtime: Option<usize>, // Only present if E > 1.
+    char operacion; 		// w o r
+    resultados_t resultado; // Hit, clean miss o dirty miss.
+    addr_t direccion;	  // tag, indice?
+    size_t instruccion;  // podemos guardar aca la linea del archivo.
+    bool valido; 		// Indica si se cargo un dato en la memoria o no.
+    bool dirty_bit;    // cambia el curso de algunas operaciones.
 }op_result_t;
 
 #endif

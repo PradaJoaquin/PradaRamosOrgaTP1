@@ -7,26 +7,11 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include "cacheutil.h"
 
 //OK
 typedef enum resultado {hit, clean_miss, dirty_miss} resultado_t;
 						 //0   ,    1     ,    2
-typedef struct addr
-{
-	int tag;
-	int index;
-	int off;
-}addr_t;
-
-typedef struct op_result
-{
-    char operacion; 		// w o r
-    resultado_t resultado; // Hit, clean miss o dirty miss.
-    addr_t direccion;	  // tag, indice?
-    size_t instruccion;  // podemos guardar aca la linea del archivo.
-    bool valido; 		// Indica si se cargo un dato en la memoria o no.
-    bool dirty_bit;    // cambia el curso de algunas operaciones.
-}op_result_t;
 
 typedef struct estadisticas
 {
