@@ -24,7 +24,7 @@ typedef struct op_result
     bool valido; 		// Indica si se cargo un dato en la memoria o no. 
     bool dirty_bit;    // cambia el curso de algunas operaciones.
     size_t ant_tag;   // -1 por default, para modo verboso.
-    size-t ant_bloque_ins; //anterior bloque->ins, para modo verboso.        
+    size_t ant_bloque_ins; //anterior bloque->ins, para modo verboso.        
 }op_result_t;
 
 #endif
