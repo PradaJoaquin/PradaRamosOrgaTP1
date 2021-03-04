@@ -134,9 +134,9 @@ bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope)
 addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
     addr_t addr;
     addr.off = dir & (block_size - 1);
-    size_t index = (dir >> ((int)log2((double)block_size) - 1));
+    size_t index = (dir >> ((int)log2((double)block_size)));
     addr.index = index & (num_sets - 1);
-    addr.tag = index >> ((int)log2((double)num_sets) - 1);
+    addr.tag = index >> ((int)log2((double)num_sets));
     return addr;
 }
 
@@ -144,7 +144,7 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result) return NULL;
     
-    addr_t addr = addr_crear(dir, cache->sets->bloques->tam, cache->S); // Corregir esto despues..
+    addr_t addr = addr_crear(dir, cache->sets->bloques->tam * 8, cache->S); // Corregir esto despues..
 
     result->operacion = op;
     result->direccion = addr;

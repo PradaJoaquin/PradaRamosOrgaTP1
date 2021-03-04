@@ -31,11 +31,27 @@ typedef struct argumentos{
 	int fin;
 }argumentos_t;
 
+// Se hace esto ya que el archivo de traza no esta separado constantemente por un espacio, sino que puede variar.
+// Encuentra la siguiente posicion valida en el arreglo.
+int sig_posision_valida(char** parametros, int actual){
+	for(int i = actual + 1; parametros[i] != NULL; i++){
+		if(strcmp(parametros[i], "") != 0){
+			return i;
+		}
+	}
+	return -1;
+}
+
 void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estadisticas) {
-	char* operacion = parametros[1];
-    size_t direccion = strtoul(parametros[2], NULL, 16);
-    int tamanio = atoi(parametros[3]);
-    size_t datos = strtoul(parametros[4], NULL, 16);
+	int pos_operacion = sig_posision_valida(parametros, 0);
+	int pos_direccion = sig_posision_valida(parametros, pos_operacion);
+	int pos_tamanio = sig_posision_valida(parametros, pos_direccion);
+	int pos_datos = sig_posision_valida(parametros, pos_tamanio);
+
+	char* operacion = parametros[pos_operacion];
+    size_t direccion = strtoul(parametros[pos_direccion], NULL, 16);
+    int tamanio = atoi(parametros[pos_tamanio]);
+    size_t datos = strtoul(parametros[pos_datos], NULL, 16);
 	
 	simulador_operar(sim, operacion, direccion, tamanio, datos, estadisticas);
 }
