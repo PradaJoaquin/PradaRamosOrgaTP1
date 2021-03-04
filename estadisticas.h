@@ -9,10 +9,6 @@
 #include <stdbool.h>
 #include "cacheutil.h"
 
-//OK
-typedef enum resultado {hit, clean_miss, dirty_miss} resultado_t;
-						 //0   ,    1     ,    2
-
 typedef struct estadisticas
 {
 	size_t lecturas;	     //se contabilizan siempre.
