@@ -20,6 +20,7 @@ typedef struct bloque
 //------------------------------------TESTEADO--------------------------------------------
 void destruir_bloques(bloque_t* bloque, size_t tope);
 
+void cache_destruir_hasta(cache_t* cache, size_t tope);
 /*
 *   Dada la cantidad de bloques, crea un vector con los bloques necesarios, inicializados y 
 *   devuelve el puntero al mismo, en caso de fallar devuelve NULL.
@@ -132,7 +133,7 @@ bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope)
 addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
     addr_t addr;
     addr.off = dir & (block_size - 1);
-    size_t index = (dir >> (int)log2((double)block_size) - 1);
+    size_t index = (dir >> ((int)log2((double)block_size) - 1));
     addr.index = index & (num_sets - 1);
     addr.tag = index >> ((int)log2((double)num_sets) - 1);
     return addr;

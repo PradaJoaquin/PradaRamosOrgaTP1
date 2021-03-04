@@ -27,7 +27,7 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
 }
 
 void simulador_destruir(simulador_t* sim){
-    cache_destruir(sim->cache,  sim->cache->S);
+    cache_destruir(sim->cache);
     free(sim);
 }
 
