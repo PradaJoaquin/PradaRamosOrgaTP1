@@ -10,9 +10,9 @@ typedef enum resultados
 
 typedef struct addr
 {
-	int tag;
-	int index;
-	int off;
+	size_t tag;
+	size_t index;
+	size_t off;
 }addr_t;
 
 typedef struct op_result
