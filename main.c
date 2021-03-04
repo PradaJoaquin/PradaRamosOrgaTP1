@@ -31,13 +31,13 @@ typedef struct argumentos{
 	int fin;
 }argumentos_t;
 
-void procesar_comando(char** parametros, simulador_t* sim) {
+void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estadisticas) {
 	char* operacion = parametros[1];
     size_t direccion = strtoul(parametros[2], NULL, 16);
     int tamanio = atoi(parametros[3]);
     size_t datos = strtoul(parametros[4], NULL, 16);
 	
-	simulador_operar(sim, operacion, direccion, tamanio, datos);
+	simulador_operar(sim, operacion, direccion, tamanio, datos, estadisticas);
 }
 
 void eliminar_fin_linea(char* linea) {
@@ -50,11 +50,13 @@ void eliminar_fin_linea(char* linea) {
 void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
 	char* linea = NULL;
 	size_t c = 0;
+	estadisticas_t estadisticas;
+
 	while (getline(&linea, &c, archivo_de_trazas) > 0) {
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros, sim);
+		procesar_comando(parametros, sim, &estadisticas);
 		free_strv(parametros);
 		free_strv(campos);
 	}

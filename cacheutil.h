@@ -18,11 +18,11 @@ typedef struct addr
 typedef struct op_result
 {
     char operacion; 		// w o r
-    resultados_t resultado; // Hit, clean miss o dirty miss.
+    resultados_t resultado;// Hit, clean miss o dirty miss.
     addr_t direccion;	  // tag, indice?
     size_t instruccion;  // podemos guardar aca la linea del archivo.
-    bool valido; 		// Indica si se cargo un dato en la memoria o no.
-    bool dirty_bit;    // cambia el curso de algunas operaciones.
+    bool valido; 		// Indica si se cargo un dato en la memoria o no. //ver si hace falta este campo
+    bool dirty_bit;    // cambia el curso de algunas operaciones.        //ver si hace falta este campo
 }op_result_t;
 
 #endif
