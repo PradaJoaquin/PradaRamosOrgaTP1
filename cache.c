@@ -31,7 +31,8 @@ bloque_t* crear_bloques(size_t asociatividad, size_t tam_bloque)
     if(!bloque) return NULL;
 
     for(size_t i = 0; i < asociatividad; ++i)
-    {
+    {   
+        bloque[i].tam = tam_bloque;
         bloque[i].data = malloc(tam_bloque); //puede contener basura.
         if(!bloque[i].data){                //debo destruir los anteriores.
             destruir_bloques(bloque, i);
@@ -53,9 +54,9 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets)
     if(!cache->sets){
         free(cache);
         return NULL;
-    }else cache->S = num_sets;
+    }
 
-    for(size_t i = 1; i < num_sets; i++)
+    for(size_t i = 0; i < num_sets; i++)
     {
         cache->sets[i].E = asociatividad;
         cache->sets[i].bloques = crear_bloques(asociatividad, tam_bloque); //aca el set queda inicializado. 
@@ -143,7 +144,7 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result) return NULL;
     
-    addr_t addr = addr_crear(dir, cache->sets->bloques->tam * 8, cache->S); // Corregir esto despues..
+    addr_t addr = addr_crear(dir, cache->sets->bloques->tam, cache->S); // Corregir esto despues..
 
     result->operacion = op;
     result->direccion = addr;
