@@ -24,6 +24,7 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
 */
 void cache_destruir(cache_t* cache, size_t tope);
 
+
 /*
 *   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
 */

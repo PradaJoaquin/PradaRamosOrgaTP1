@@ -18,16 +18,24 @@ bool test (bool comparacion)
 
 int main()
 {
-//cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
 	size_t tam = 2048;
 	size_t E = 2;
 	size_t S = 64; 
+	size_t tamanio_bloque = tam/(E*S); 
 	cache_t* cache = cache_crear(tam, E, S);
 	printf("\n-----------------PRUEBAS DE CREACION/ DESTRUCCION--------------\n");
+	
+/*	
+	//bloque_t* bloque = crear_bloques(E, tamanio_bloque); 
+	printf(" Creo un vector de bloques ");
+	test(bloque != NULL);
+	printf(" Destruyo el bloque\n");
+	destruir_bloques(bloque, E);
+*/	
 	printf(" Creo una cache vacia ");
 	test(cache != NULL);
 
-//void cache_destruir(cache_t* cache, size_t tope);
+	printf(" Destruyo el bloque\n");
 	cache_destruir(cache, S);
 	return 0;
 }

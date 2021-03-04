@@ -45,7 +45,7 @@ bloque_t* crear_bloques(size_t asociatividad, size_t tam_bloque)
         if(!bloque[i].data){                //debo destruir los anteriores.
             destruir_bloques(bloque, i);
             return NULL;
-        }else bloque[i].tag = i; //inicializa el tag, son todos sucesivos van de 0 a i(E -1).
+        }else bloque[i].tag = i;         //inicializa el tag, son todos sucesivos van de 0 a i(E -1).
     }
     return bloque; //todos los parametros restantes son 0 por calloc.
 }
@@ -79,8 +79,9 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets)
 
 void destruir_bloques(bloque_t* bloque, size_t tope)
 {
-    for (size_t i = tope-1; i > 0; i--)
+    for (size_t i = tope-1; i > 0; --i)
         free(bloque[i].data);
+    free(bloque->data);
     free(bloque);
 }
 
@@ -101,7 +102,7 @@ void cache_destruir(cache_t* cache, size_t tope)
         if(cache->sets[i].bloques != NULL)
             //existen los bloques. ok.
             destruir_bloques(cache->sets[i].bloques, cache->sets[i].E);   //128
-        free( &(cache->sets[i]) );                                       //64
+        else free( &(cache->sets[i]) );                                  //64
     } 
 
     free(cache->sets); //1
@@ -129,10 +130,8 @@ bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope)
     for (size_t i = 1; i < tope; ++i)
     {
         if( bloques[i]->ins < ins_menor){
-            //guardo la menor instruccion.
-            ins_menor = bloques[i]->ins;
-            //guardo el puntero del bloque en el auxiliar.
-            pos_menor = i;
+            ins_menor = bloques[i]->ins; //guardo la menor instruccion.
+            pos_menor = i;   //guardo el puntero del bloque en el auxiliar.
         }
     }
     return bloques[pos_menor]; //puntero al bloque.

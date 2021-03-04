@@ -1,6 +1,16 @@
 #include "estadisticas.h"
 
 //OK
+typedef struct estadisticas
+{
+	size_t lecturas;	     //se contabilizan siempre.
+	size_t escrituras;      //lecturas + escrituras = N instrucciones.
+	size_t rmiss;    	   //Se activa cuando dirty bit = 0.
+	size_t wmiss;		  //rmiss + wmiss = total miss.
+	size_t dirty_rmiss;  //Se contabiliza cuando rmiss + dirty bit = 1.
+	size_t dirty_wmiss; //Se contabiliza cuando wmiss + dirty bit = 1.
+}estadisticas_t;
+
 /*penalizaciones (ciclos)
 *
 *   clean miss = 1 + penalty; (clean miss = rmiss + wmiss)
