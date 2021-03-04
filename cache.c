@@ -5,92 +5,115 @@
 
 #define TAM_DIRECCION_MEMORIA 32
 
-typedef struct addr
-{
-	size_t tag;
-	size_t index;
-	size_t off;
-}addr_t;
 
 typedef struct bloque
 {
 	bool es_valido;  //se activa cuando se realiza una escritura por primera vez en ese set/tag.
 	bool dirty_bit; //se activa cuando se produce un miss y se realiza una escritura.
-	size_t tag;   //identifica el bloque.
-	void* data; //la unidad minima es de 2 bytes, = void dato[tope];
+	size_t tag;    //identifica el bloque.
+	void* data;   //la unidad minima es de 2 bytes, = void dato[tope];
+    size_t ins;  //Guarda la instruccion que usa el bloque (puede ser la linea del archivo).
 }bloque_t;
 
-typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
-{
-    size_t E; // Cantidad de bloques = "E"
-	bloque_t* bloques; 	   // = bloque_t bloques[]
-}set_t;
 
-struct cache
-{
-    int time; // Se usa para el last recently used, numero de operacion actual. 
-    size_t S; // Parametro "S" cantidad de sets
-    set_t* sets;
-};
+//------------------------------------TESTEADO--------------------------------------------
+void destruir_bloques(bloque_t* bloque, size_t tope);
 
-cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets){
+/*
+*   Dada la cantidad de bloques, crea un vector con los bloques necesarios, inicializados y 
+*   devuelve el puntero al mismo, en caso de fallar devuelve NULL.
+*/
+bloque_t* crear_bloques(size_t asociatividad, size_t tam_bloque)
+{   
+    bloque_t* bloque = calloc(asociatividad, sizeof(bloque_t)); 
+    if(!bloque) return NULL;
+
+    for(size_t i = 0; i < asociatividad; ++i)
+    {
+        bloque[i].data = malloc(tam_bloque); //puede contener basura.
+        if(!bloque[i].data){                //debo destruir los anteriores.
+            destruir_bloques(bloque, i);
+            return NULL;
+        }else bloque[i].tag = i;         //inicializa el tag, son todos sucesivos van de 0 a i(E -1).
+    }
+    return bloque; //todos los parametros restantes son 0 por calloc.
+}
+
+cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets)
+{
     size_t tam_bloque = tam / (asociatividad * num_sets);
 
-    cache_t* cache = malloc(sizeof(cache_t));
-    if(!cache){
-        return NULL;
-    }
+    cache_t* cache = malloc(sizeof(cache_t));  
+    if(!cache) return NULL;
+    
     cache->S = num_sets;
-    cache->sets = malloc(sizeof(set_t) * num_sets);
+    cache->sets = calloc(num_sets, sizeof(set_t)); //asi se inicializa. 
     if(!cache->sets){
         free(cache);
         return NULL;
-    }
-    int k = 0;
-    for(int i = 0; i < num_sets; i++){
+    }else cache->S = num_sets;
+
+    for(size_t i = 1; i < num_sets; i++)
+    {
         cache->sets[i].E = asociatividad;
-        cache->sets[i].bloques = malloc(sizeof(bloque_t) * asociatividad);
+        cache->sets[i].bloques = crear_bloques(asociatividad, tam_bloque); //aca el set queda inicializado. 
         if(!cache->sets[i].bloques){
-            for(int j = 0; j < i; j++){
-                for(int q = 0; q < k; q++){
-                    free(cache->sets[j].bloques[q].data);
-                }
-                free(cache->sets[j].bloques);
-            }  
-            free(cache->sets);
-            free(cache);
+            cache_destruir(cache, i); //destruye hasta la posicion indicada.
             return NULL;
-        }
-        for(k = 0; k < asociatividad; k++){
-            cache->sets[i].bloques[k].es_valido = 0;
-            cache->sets[i].bloques[k].dirty_bit = 0;
-            cache->sets[i].bloques[k].tag = 0;
-            cache->sets[i].bloques[k].data = malloc(sizeof(tam_bloque));
-            if(!cache->sets[i].bloques[k].data){
-                for(int j = 0; j < i; j++){
-                    for(int q = 0; q < k; q++){
-                        free(cache->sets[j].bloques[q].data);
-                    }
-                    free(cache->sets[j].bloques);
-                }
-                free(cache->sets);
-                free(cache);
-                return NULL;
-            }
         }
     }
     return cache;
 }
 
-void cache_destruir(cache_t* cache){
-    for(int i = 0; i < cache->S; i++){
-        for(int k = 0; k < cache->sets[i].E; k++){
-            free(cache->sets[i].bloques[k].data);
+void destruir_bloques(bloque_t* bloque, size_t tope)
+{
+    for (size_t i = tope-1; i > 0; --i)
+        free(bloque[i].data);
+    free(bloque->data);
+    free(bloque);
+}
+
+/*
+*   Desrtuye hasta la posicion indicada por max, si se desea destruir todo, debe pasarse la cantidad de sets.
+**  Se implemento de esta forma para manejar los errores de memoria al crear, optimizando la reutilizacion de codigo.
+*/
+void cache_destruir(cache_t* cache, size_t tope)
+{
+    if(!cache) return;
+    if(!cache->sets){
+        free(cache);
+        return;
+    } 
+
+    for(size_t i = tope -1; i > 0; i--)
+    {
+        if(cache->sets[i].bloques != NULL)
+            //existen los bloques. ok.
+            destruir_bloques(cache->sets[i].bloques, cache->sets[i].E);   
+        else free( &(cache->sets[i]) );                                  
+    } 
+
+    free(cache->sets); 
+    free(cache);      
+} 
+//----------------------------------------------------------------------------------------
+
+/*
+*   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
+*/
+bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope)
+{
+    size_t ins_menor = bloques[0]->ins; //todas son positivas.
+    size_t pos_menor = 0;
+
+    for (size_t i = 1; i < tope; ++i)
+    {
+        if( bloques[i]->ins < ins_menor){
+            ins_menor = bloques[i]->ins; //guardo la menor instruccion.
+            pos_menor = i;   //guardo el puntero del bloque en el auxiliar.
         }
-        free(cache->sets[i].bloques);
     }
-    free(cache->sets);
-    free(cache);
+    return bloques[pos_menor]; //puntero al bloque.
 }
 
 addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
@@ -101,27 +124,24 @@ addr_t addr_crear(size_t dir, size_t block_size, size_t num_sets){
     return addr;
 }
 
-op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size_t datos){
+op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos){
     op_result_t* result = malloc(sizeof(op_result_t));
-    if(!result){
-        return NULL;
-    }
+    if(!result) return NULL;
+    
     addr_t addr = addr_crear(dir, sizeof(cache->sets->bloques->data) * 8, cache->S); // Corregir esto despues.. (el sizeof esta mal)
 
     result->operacion = op;
     result->direccion = addr;
 
     set_t set = cache->sets[addr.index];
-    for(int i = 0; i < set.E; i++){
+    for(size_t i = 0; i < set.E; i++){
         if(set.bloques[i].tag == addr.tag){
             // HIT
-            result->resultado = // HIT
+            result->resultado = hit; // HIT revisar
         }
     }
     // MISS
-    bloque_t remplazo = encontrar_LRU(cache); // revisar esta funcion
-
-
+    bloque_t* remplazo = encontrar_LRU(&set.bloques, set.E);
 
     return result;
 }

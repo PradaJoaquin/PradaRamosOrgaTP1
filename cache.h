@@ -8,7 +8,9 @@
 #define PENALTY 100 //o 101 con el siguiente HIT. 
 
 typedef struct cache cache_t;
+typedef struct bloque bloque_t;
 
+/*
 typedef struct estadisticas
 {
 	size_t lecturas;	     //se contabilizan siempre.
@@ -20,16 +22,42 @@ typedef struct estadisticas
 	size_t rmiss;	   //rmiss + wmiss = total miss.
 	size_t wmiss;
 }estadisticas_t;
+*/
 
-//bytes written = (escrituras + wmiss) * unidad_datos.
-//bytes read = (lecturas + rmiss) * unidad_datos.
-//miss rate = total miss / (lecturas + escrituras).
-//capacidad cache = S x E x Unidad Datos.
+//Simulador debe conocer cache y set, por E y S, y bloques que se acceden en el .c
+typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
+{
+    size_t E; // Cantidad de bloques = "E"
+	bloque_t* bloques; 	   // = bloque_t bloques[]
+}set_t;
 
+typedef struct cache
+{
+    int time; // Se usa para el last recently used, numero de operacion actual. 
+    size_t S; // Parametro "S" cantidad de sets
+    set_t* sets;
+}cache_t;
+
+
+
+/*
+*	Dado los argumentos del programa, crea una matriz cache inicializada y devuelve su puntero
+* 	o NULL en caso de que no se pueda crear.
+*/
 cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
 
-void cache_destruir(cache_t* cache);
 
-op_result_t* cache_operar(cache_t* cache, char* op, size_t dir, size_t tam, size_t datos);
+/*
+*   Desrtuye hasta la posicion indicada por tope, si se desea destruir todo, debe pasarse la cantidad de sets.
+**  Se implemento de esta forma para manejar los errores de memoria al crear, optimizando la reutilizacion de codigo.
+*/
+void cache_destruir(cache_t* cache, size_t tope);
+
+/*
+*   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
+*/
+bloque_t* encontrar_LRU(bloque_t** bloques, size_t tope);
+
+op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos);
 
 #endif
