@@ -21,8 +21,10 @@ typedef struct op_result
     resultados_t resultado;// Hit, clean miss o dirty miss.
     addr_t direccion;	  // tag, indice?
     size_t instruccion;  // podemos guardar aca la linea del archivo.
-    bool valido; 		// Indica si se cargo un dato en la memoria o no. //ver si hace falta este campo
-    bool dirty_bit;    // cambia el curso de algunas operaciones.        //ver si hace falta este campo
+    bool valido; 		// Indica si se cargo un dato en la memoria o no. 
+    bool dirty_bit;    // cambia el curso de algunas operaciones.
+    size_t ant_tag;   // -1 por default, para modo verboso.
+    size-t ant_bloque_ins; //anterior bloque->ins, para modo verboso.        
 }op_result_t;
 
 #endif
