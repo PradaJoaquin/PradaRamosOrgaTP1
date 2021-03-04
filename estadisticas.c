@@ -1,5 +1,6 @@
 #include "estadisticas.h"
 
+//OK
 /*penalizaciones (ciclos)
 *
 *   clean miss = 1 + penalty; (clean miss = rmiss + wmiss)
@@ -45,9 +46,9 @@ void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, 
 
 	if(E == 1) printf("Direct-mapped, ");
 	else printf("%ld-way, ", E);
-	printf("%ld sets, size = %ldKB \n", sets tamanio_cache/KB);
-	printf("Loads: %ld stores: %ld total: \n", estadisticas->lecturas, estadisticas->escrituras, estadisticas->lecturas + estadisticas->escrituras);
-	printf("rmiss: %ld, wmiss: %ld total: \n", estadisticas->rmiss, estadisticas->wmiss, estadisticas->rmiss + estadisticas->wmiss);
+	printf("%ld sets, size = %ldKB \n", sets, tamanio_cache/KB);
+	printf("Loads: %ld stores: %ld total: %ld \n", estadisticas->lecturas, estadisticas->escrituras, estadisticas->lecturas + estadisticas->escrituras);
+	printf("rmiss: %ld, wmiss: %ld total: %ld\n", estadisticas->rmiss, estadisticas->wmiss, estadisticas->rmiss + estadisticas->wmiss);
 	printf("dirty rmis: %ld dirty wmiss: %ld \n", estadisticas->dirty_rmiss, estadisticas->dirty_wmiss);
 	printf("bytes read: %ld bytes written: %ld \n", calcular_bytes_read(estadisticas, tamanio_bloque), calcular_bytes_written(estadisticas, tamanio_bloque) );
 	printf("Read time: %ld write time: %ld\n", calcular_readtime(estadisticas), calcular_writetime(estadisticas) );
@@ -61,15 +62,17 @@ void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result)
 	if(!estadisticas || !op_result) return;
 	
 	if(op_result->operacion == 'W' || op_result->operacion == 'w'){
-		*(estadisticas->escrituras)++;
+		estadisticas->escrituras++;
 		escritura = true;
-	}else *(estadisticas->lecturas)++;
+	}else estadisticas->lecturas++;
 
 	if(op_result->resultado == clean_miss)
-		if(escritura) *(estadisticas->wmiss)++;
-		else *(estadisticas->rmiss)++;
+		if(escritura) estadisticas->wmiss++;
+		else estadisticas->rmiss++;
 
 	else if(op_result->resultado == dirty_miss)
-		if(escritura) *(estadisticas->dirty_wmiss)++;
-		else *(estadisticas->dirty_rmiss)++;
+	{
+		if(escritura) estadisticas->dirty_wmiss++;
+		else estadisticas->dirty_rmiss++;
+	}
 }

@@ -6,10 +6,17 @@
 #define KB 1024
 
 #include <stdio.h>
+#include <stdbool.h>
 
-typedef enum resultado = {hit, clean_miss, dirty_rmiss} resultado_t;
+//OK
+typedef enum resultado {hit, clean_miss, dirty_miss} resultado_t;
 						 //0   ,    1     ,    2
-typedef struct addr addr_t;
+typedef struct addr
+{
+	int tag;
+	int index;
+	int off;
+}addr_t;
 
 typedef struct op_result
 {
@@ -18,7 +25,7 @@ typedef struct op_result
     addr_t direccion;	  // tag, indice?
     size_t instruccion;  // podemos guardar aca la linea del archivo.
     bool valido; 		// Indica si se cargo un dato en la memoria o no.
-    bool dirty_bit     // cambia el curso de algunas operaciones.
+    bool dirty_bit;    // cambia el curso de algunas operaciones.
 }op_result_t;
 
 typedef struct estadisticas
@@ -26,11 +33,9 @@ typedef struct estadisticas
 	size_t lecturas;	     //se contabilizan siempre.
 	size_t escrituras;      //lecturas + escrituras = N instrucciones.
 	size_t rmiss;    	   //Se activa cuando dirty bit = 0.
-	size_t wmiss
+	size_t wmiss;		  //rmiss + wmiss = total miss.
 	size_t dirty_rmiss;  //Se contabiliza cuando rmiss + dirty bit = 1.
 	size_t dirty_wmiss; //Se contabiliza cuando wmiss + dirty bit = 1.
-	size_t rmiss;	   //rmiss + wmiss = total miss.
-	size_t wmiss;
 }estadisticas_t;
 
 /*
@@ -47,6 +52,6 @@ void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result);
 *  Imprime y calcula todas las estadisticas relevantes del el archivo:
 *  lectuas, escrituras, clean misses, dirty misses, bytes leidos y bytes escritos.
 */
-void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, size_t tamanio_cache)
+void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, size_t tamanio_cache);
 
 #endif //__ESTADISTICAS_H__ 
