@@ -188,6 +188,7 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
     bloque_t* remplazo = encontrar_LRU(set.bloques, set.E);
     result->valido = remplazo->es_valido;
     result->dirty_bit = remplazo->dirty_bit;
+    result->ant_bloque_ins = 0;
 
     if(!remplazo->es_valido || !remplazo->dirty_bit){
         // Clean cache miss
