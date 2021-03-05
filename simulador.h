@@ -1,6 +1,8 @@
 #ifndef __SIMULADOR_H__
 #define __SIMULADOR_H__ 
 
+#include <stdlib.h>
+
 typedef struct simulador simulador_t;
 
 /*
