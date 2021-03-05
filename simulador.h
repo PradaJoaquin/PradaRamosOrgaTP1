@@ -1,7 +1,7 @@
 #ifndef __SIMULADOR_H__
 #define __SIMULADOR_H__ 
 
-#include <stdlib.h>
+#include <stddef.h> //size_t
 
 typedef struct simulador simulador_t;
 
@@ -23,7 +23,8 @@ void simulador_destruir(simulador_t* sim);
 void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t instruccion);
 
 /*
-*	Imprime las estadisticas acumuladas hasta el momento.
+*	Imprime las estadisticas acumuladas hasta el momento:
+*   lectuas, escrituras, clean misses, dirty misses, bytes leidos y bytes escritos.
 */
 void simulador_imprimir_estadisticas(simulador_t* sim);
 

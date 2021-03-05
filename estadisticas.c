@@ -44,7 +44,7 @@ void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, 
 	if(!estadisticas || sets == 0 || E == 0) return;
 	size_t tamanio_bloque = tamanio_cache/ (sets*E);
 
-	if(E == 1) printf("direct-mapped, ");
+	if(E == 1) printf("Direct-mapped, ");
 	else printf("%ld-way, ", E);
 	printf("%ld sets, size = %ldKB \n", sets, tamanio_cache/KB);
 	printf("Loads: %ld stores: %ld total: %ld \n", estadisticas->lecturas, estadisticas->escrituras, estadisticas->lecturas + estadisticas->escrituras );
@@ -81,17 +81,11 @@ void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result)
 
 estadisticas_t* estadisticas_crear()
 {
-	estadisticas_t* estadisticas = malloc(sizeof(estadisticas_t));
+	estadisticas_t* estadisticas = calloc(1, sizeof(estadisticas_t));
 	if(!estadisticas){
 		return NULL;
 	}
-	estadisticas->lecturas = 0;
-	estadisticas->escrituras = 0;
-	estadisticas->rmiss = 0;
-	estadisticas->wmiss = 0;
-	estadisticas->dirty_rmiss = 0;
-	estadisticas->dirty_wmiss = 0;
-
+	
 	return estadisticas;
 }
 

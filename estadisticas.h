@@ -11,11 +11,15 @@
 
 typedef struct estadisticas estadisticas_t;
 
+
 /*
-*  capacidad cache = S x E x Unidad Datos.
+*	Devuelve un puntero a una estadistica inicializada, si falla devuelve NULL.
 */
 estadisticas_t* estadisticas_crear();
 
+/*
+*	Destruye una estadistica.
+*/
 void estadisticas_destruir(estadisticas_t* estadisticas);
 
 /*
