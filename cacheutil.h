@@ -1,6 +1,9 @@
 #ifndef __CACHEUTIL_H__
 #define __CACHEUTIL_H__ 
 
+#include <stdio.h> //size_t
+#include <stdbool.h> //bool
+
 typedef enum resultados
 {
     hit,

@@ -80,8 +80,8 @@ void destruir_bloques(bloque_t* bloque, size_t tope)
 }
 
 void cache_destruir(cache_t* cache){
-    for(int i = 0; i < cache->S; i++){
-        for(int k = 0; k < cache->sets[i].E; k++){
+    for(size_t i = 0; i < cache->S; i++){
+        for(size_t k = 0; k < cache->sets[i].E; k++){
             free(cache->sets[i].bloques[k].data);
         }
         free(cache->sets[i].bloques);
@@ -122,7 +122,7 @@ void cache_destruir_hasta(cache_t* cache, size_t tope)
 bloque_t* encontrar_LRU(bloque_t* bloques, size_t tope)
 {
     size_t ins_menor; //todas son positivas.
-    size_t pos_menor = -1;
+    long int pos_menor = -1;
 
     for (size_t i = 0; i < tope; ++i)
     {
@@ -156,7 +156,10 @@ void configurar_remplazo(bloque_t* remplazo, char op, addr_t addr, size_t instru
     }
 }
 
-op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos, size_t instruccion){
+//warning datos sin usar.
+//debo capturar la instruccion anterior que tenia el bloque, antes de actualizarlo, para el modo verboso.
+op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccion){
+    
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result) return NULL;
     
@@ -170,7 +173,9 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_
     for(size_t i = 0; i < set.E; i++){
         if(set.bloques[i].es_valido && set.bloques[i].tag == addr.tag){
             // HIT
+            result->ant_bloque_ins = set.bloques[i].ins; //para el modo verboso.
             set.bloques[i].ins = instruccion;
+
             if(op == ESCRITURA){
                 set.bloques[i].dirty_bit = true;
             }

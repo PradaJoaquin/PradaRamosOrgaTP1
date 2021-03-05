@@ -7,7 +7,6 @@
 #include "cacheutil.h"
 #include "estadisticas.h"
 
-#define HIT "1"
 #define CLEAN_MISS "2a"
 #define DIRTY_MISS "2b"
 
@@ -61,32 +60,32 @@ void simulador_destruir(simulador_t* sim){
     8_ dirty bit                                            (ok result)
     9_ lru local (debo buscar el menor siempre).            (ok funcion cache).(se debe agregar a operar)
 */
-void simulador_modo_verboso(op_result_t* result, size_t n, size_t m){
+void simulador_modo_verboso(op_result_t* result, size_t instruccion){
 	//0 2a 36 2feee4 0 -1 0 0 0
-    printf("%ld ",n  );
-    if(op_result->resultado == hit) printf("%s ", HIT);
-    else if(op_result->resultado == clean_miss) printf("%s ", CLEAN_MISS);
+    printf("%ld ", instruccion);
+    if(result->resultado == hit) printf("%d ", HIT);
+    else if(result->resultado == clean_miss) printf("%s ", CLEAN_MISS);
     else printf("%s ", DIRTY_MISS);
 
-    printf("%ld ", op_result->addr->index);
-    printf("%x ", op_result->addr->tag);  
-    printf("%ld ", op_result->addr->off);
+    printf("%ld ", result->direccion.index);
+    printf("%lx ", result->direccion.tag);  
+    printf("%ld ", result->direccion.off);
     
-    printf("%x ", op_result->addr->ant_tag);  //-1 por default, necesito la etiqueta anterior
-    printf("%ld ", op_result->addr->valid_bit);
-    printf("%ld ", op_result->addr->dirty_bit);
-    //printf("%ld\n", ); //necesito el anterior bloque->ins.
+    printf("%lx ", result->ant_tag);  //-1 por default, necesito la etiqueta anterior
+    printf("%d ", result->valido);
+    printf("%d ", result->dirty_bit);
+    printf("%ld\n", result->ant_bloque_ins); 
 }
 
 //simulador debe recibir estadisticas si solo hace una operacion a la vez.
-void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos, size_t instruccion, 
+void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t instruccion, 
     estadisticas_t* estadisticas){
-
-    op_result_t* result = cache_operar(sim->cache, *operacion, direccion, tam, datos, instruccion);
+//op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos);
+    op_result_t* result = cache_operar(sim->cache, *operacion, direccion, instruccion);
     if(!result) return;
 
     if(sim->modo_verb_restante > 0){
-        simulador_modo_verboso(result);
+        simulador_modo_verboso(result, instruccion);
         sim->modo_verb_restante--;
     }
     //comienzo de operaciones.

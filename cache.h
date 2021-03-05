@@ -10,20 +10,6 @@
 typedef struct cache cache_t;
 typedef struct bloque bloque_t;
 
-/*
-typedef struct estadisticas
-{
-	size_t lecturas;	     //se contabilizan siempre.
-	size_t escrituras;      //lecturas + escrituras = N instrucciones.
-	size_t hits;		   //se dan si coinciden (set, tag y validate bit).
-	size_t clean_miss;    //Se activa cuando dirty bit = 0.
-	size_t dirty_rmiss;  //Se contabiliza cuando rmiss + dirty bit = 1.
-	size_t dirty_wmiss; //Se contabiliza cuando wmiss + dirty bit = 1.
-	size_t rmiss;	   //rmiss + wmiss = total miss.
-	size_t wmiss;
-}estadisticas_t;
-*/
-
 //Simulador debe conocer cache y set, por E y S, y bloques que se acceden en el .c
 typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
 {
@@ -48,10 +34,11 @@ cache_t* cache_crear(size_t tam, size_t asociatividad, size_t num_sets);
 
 
 /*
-*   Destruye la cache.
+*   Desrtuye hasta la posicion indicada por tope, si se desea destruir todo, debe pasarse la cantidad de sets.
 */
 void cache_destruir(cache_t* cache);
 
-op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos, size_t instruccion);
+
+op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccion);
 
 #endif
