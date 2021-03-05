@@ -44,7 +44,7 @@ void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, 
 	if(!estadisticas || sets == 0 || E == 0) return;
 	size_t tamanio_bloque = tamanio_cache/ (sets*E);
 
-	if(E == 1) printf("Direct-mapped, ");
+	if(E == 1) printf("direct-mapped, ");
 	else printf("%ld-way, ", E);
 	printf("%ld sets, size = %ldKB \n", sets, tamanio_cache/KB);
 	printf("Loads: %ld stores: %ld total: %ld \n", estadisticas->lecturas, estadisticas->escrituras, estadisticas->lecturas + estadisticas->escrituras );
