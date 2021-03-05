@@ -3,8 +3,6 @@
 #include <math.h>
 #include "cache.h"
 
-#define BYTE_SIZE 8
-
 #define ESCRITURA 'W'
 #define LECTURA 'R'
 
@@ -162,7 +160,7 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result) return NULL;
     
-    addr_t addr = addr_crear(dir, cache->sets->bloques->tam * BYTE_SIZE, cache->S);
+    addr_t addr = addr_crear(dir, cache->sets->bloques->tam, cache->S);
 
     result->operacion = op;
     result->direccion = addr;
