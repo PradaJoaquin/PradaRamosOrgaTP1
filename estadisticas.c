@@ -1,5 +1,15 @@
+#include <stdlib.h>
 #include "estadisticas.h"
 
+struct estadisticas
+{
+	size_t lecturas;	     //se contabilizan siempre.
+	size_t escrituras;      //lecturas + escrituras = N instrucciones.
+	size_t rmiss;    	   //Se activa cuando dirty bit = 0.
+	size_t wmiss;		  //rmiss + wmiss = total miss.
+	size_t dirty_rmiss;  //Se contabiliza cuando rmiss + dirty bit = 1.
+	size_t dirty_wmiss; //Se contabiliza cuando wmiss + dirty bit = 1.
+};
 
 size_t calcular_readtime(estadisticas_t* estadisticas){
 	return estadisticas->lecturas +  ((estadisticas->rmiss + estadisticas->dirty_rmiss) * PENALTY);
@@ -69,13 +79,22 @@ void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result)
 	}
 }
 
-void inicializar_estadisticas(estadisticas_t* estadisticas)
+estadisticas_t* estadisticas_crear()
 {
-	if(!estadisticas) return;
+	estadisticas_t* estadisticas = malloc(sizeof(estadisticas_t));
+	if(!estadisticas){
+		return NULL;
+	}
 	estadisticas->lecturas = 0;
 	estadisticas->escrituras = 0;
 	estadisticas->rmiss = 0;
 	estadisticas->wmiss = 0;
 	estadisticas->dirty_rmiss = 0;
 	estadisticas->dirty_wmiss = 0;
+
+	return estadisticas;
+}
+
+void estadisticas_destruir(estadisticas_t* estadisticas){
+	free(estadisticas);
 }

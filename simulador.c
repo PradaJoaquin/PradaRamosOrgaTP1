@@ -13,9 +13,14 @@
 struct simulador
 {
     cache_t* cache;
-    size_t cache_cant_sets;
+    size_t cache_tam;
+    size_t cache_asociatividad;
+    size_t cache_sets;
+
     size_t modo_verb_inicio;
     size_t modo_verb_final;
+
+    estadisticas_t* estadisticas;
 };
 
 simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_t cache_sets, size_t ini, size_t fin){
@@ -29,15 +34,27 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
         return NULL;
     }
 
+    sim->estadisticas = estadisticas_crear();
+    if(!sim->estadisticas){
+        cache_destruir(sim->cache);
+        free(sim);
+        return(NULL);
+    }
+
     sim->modo_verb_final = fin;
     sim->modo_verb_inicio = ini;
-    sim->cache_cant_sets = cache_sets;
+
+    sim->cache_tam = cache_tam;
+    sim->cache_asociatividad = cache_asociatividad;
+    sim->cache_sets = cache_sets;
+    
     return sim;
 }
 
 void simulador_destruir(simulador_t* sim){
     if(!sim) return;
     cache_destruir(sim->cache);
+    estadisticas_destruir(sim->estadisticas);
     free(sim);
 }
 
@@ -69,20 +86,25 @@ void simulador_modo_verboso(op_result_t* result, size_t instruccion, size_t asoc
 }
 
 //simulador debe recibir estadisticas si solo hace una operacion a la vez.
-void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t instruccion, 
-    estadisticas_t* estadisticas){
+void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t instruccion){
 
-    if(!sim || !estadisticas) return;
+    if(!sim){
+        return;
+    }
     
     op_result_t* result = cache_operar(sim->cache, *operacion, direccion, instruccion);
     if(!result) return;
 
     if(instruccion == sim->modo_verb_inicio && instruccion <= sim->modo_verb_final && sim->modo_verb_final != 0 ){
-        simulador_modo_verboso(result, instruccion, sim->cache_cant_sets);
+        simulador_modo_verboso(result, instruccion, sim->cache_sets);
         sim->modo_verb_inicio++; //avanzo inicio junto con la instruccion.
     }
 
     //Aca se actualizan las estadisticas totales con lo que devuelva cache_operar.
-    cargar_estadisticas(estadisticas, result);
+    cargar_estadisticas(sim->estadisticas, result);
     free(result);
+}
+
+void simulador_imprimir_estadisticas(simulador_t* sim){
+    imprimir_estadisticas(sim->estadisticas, sim->cache_sets, sim->cache_asociatividad, sim->cache_tam);
 }

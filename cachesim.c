@@ -8,7 +8,6 @@
 #include "mensajes.h"
 #include "simulador.h"
 
-
 enum parametros{
 	_,
 	ruta,
@@ -40,14 +39,14 @@ int sig_posision_valida(char** parametros, int actual){
 	return -1;
 }
 
-void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estadisticas, size_t instruccion) {
+void procesar_comando(char** parametros, simulador_t* sim, size_t instruccion) {
 	int pos_operacion = sig_posision_valida(parametros, 0);
 	int pos_direccion = sig_posision_valida(parametros, pos_operacion);
 
 	char* operacion = parametros[pos_operacion];
     size_t direccion = strtoul(parametros[pos_direccion], NULL, 16);
 
-	simulador_operar(sim, operacion, direccion, instruccion, estadisticas);
+	simulador_operar(sim, operacion, direccion, instruccion);
 }
 
 void eliminar_fin_linea(char* linea) {
@@ -57,25 +56,21 @@ void eliminar_fin_linea(char* linea) {
 	}
 }
 
-void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim, argumentos_t* args) {
+void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
 	char* linea = NULL;
 	size_t c = 0;
-	estadisticas_t estadisticas;
-	inicializar_estadisticas(&estadisticas);
 
 	size_t instruccion = 0;
 	while (getline(&linea, &c, archivo_de_trazas) > 0) {
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros, sim, &estadisticas, instruccion);
+		procesar_comando(parametros, sim, instruccion);
 		free_strv(parametros);
 		free_strv(campos);	
 		instruccion++;
 	}
 	free(linea);
-
-	imprimir_estadisticas(&estadisticas, args->num_sets, args->asociatividad, args->tam_cache);
 }
 
 bool es_potencia_de_2(double numero) {
@@ -136,8 +131,10 @@ int main(int argc, char** argv) {
     }
 
 	simulador_t* sim = simulador_crear(args.tam_cache, args.asociatividad, args.num_sets, args.ini, args.fin);
-    
-    procesar_entrada(archivo_trazas, sim, &args);
+
+    procesar_entrada(archivo_trazas, sim);
+	simulador_imprimir_estadisticas(sim);
+
 	simulador_destruir(sim);
     fclose(archivo_trazas);
 	return 0;
