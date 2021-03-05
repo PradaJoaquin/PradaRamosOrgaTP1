@@ -1,13 +1,6 @@
 #include "estadisticas.h"
 
 //OK
-/*penalizaciones (ciclos)
-*
-*   clean miss = 1 + penalty; (clean miss = rmiss + wmiss)
-*   dirty miss = 1 + 2*penalty; (dirty miss = d rmiss + s w miss)
-*  	readtime =  (rmiss + dirty_rmiss) * penalty + lecturas;  (1 lectura = 1 ciclo)
-*  	writetime = (wmiss + dirty wmiss) *  penalty + escrituras;
-*/
 size_t calcular_readtime(estadisticas_t* estadisticas){
 	return estadisticas->lecturas +  ((estadisticas->rmiss + estadisticas->dirty_rmiss) * PENALTY);
 }
@@ -19,17 +12,14 @@ size_t calcular_writetime(estadisticas_t* estadisticas){
 /*
 * Tamaño del bloque debe estar validado para ambos casos.
 */
-//*  bytes written = (dirty rmiss + dirty wmiss) * tamanio bloque.
 size_t calcular_bytes_written(estadisticas_t* estadisticas, size_t tamanio_bloque){
-	return ( (estadisticas->rmiss + estadisticas->wmiss) *  tamanio_bloque); 
-}
-
-//*  bytes read = total misses x tamanio bloque. (tamanio bloque = cache size /(S*E)).
-size_t calcular_bytes_read(estadisticas_t* estadisticas, size_t tamanio_bloque){
 	return ( (estadisticas->dirty_rmiss + estadisticas->dirty_wmiss) *  tamanio_bloque); 
 }
 
-//*  miss rate = total miss / (lecturas + escrituras).
+size_t calcular_bytes_read(estadisticas_t* estadisticas, size_t tamanio_bloque){
+	return ( (estadisticas->rmiss + estadisticas->wmiss) *  tamanio_bloque);
+}
+
 float calcular_miss_rate(estadisticas_t* estadisticas)
 {
 	return (float)(estadisticas->rmiss + estadisticas->wmiss) / 
@@ -66,11 +56,13 @@ void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result)
 		escritura = true;
 	}else estadisticas->lecturas++;
 
-	if(op_result->resultado == clean_miss)
+	if(op_result->resultado == clean_miss || op_result->resultado == dirty_miss){ 
+		//en ambos caso se contabiliza un clean miss, ya que primero sucede un clean miss y despues un sirty miss.
 		if(escritura) estadisticas->wmiss++;
 		else estadisticas->rmiss++;
+	}
 
-	else if(op_result->resultado == dirty_miss)
+	if(op_result->resultado == dirty_miss)
 	{
 		if(escritura) estadisticas->dirty_wmiss++;
 		else estadisticas->dirty_rmiss++;
