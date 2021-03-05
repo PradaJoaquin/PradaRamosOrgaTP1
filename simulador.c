@@ -27,70 +27,51 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
         free(sim);
         return NULL;
     }
-    //sim->modo_verb_restante = fin - ini; //ERROR no empieza desde inicio si no es 0.
+
     sim->modo_verb_final = fin;
     sim->modo_verb_inicio = ini;
     return sim;
 }
 
 void simulador_destruir(simulador_t* sim){
+    if(!sim) return;
     cache_destruir(sim->cache);
     free(sim);
 }
 
-/*
-    typedef struct op_result
-    {
-        char operacion;           // w o r
-        resultados_t resultado;  // Hit, clean miss o dirty miss.
-        addr_t direccion;       // tag, indice?
-        size_t instruccion;    // podemos guardar aca la linea del archivo.
-        bool valido;          // Indica si se cargo un dato en la memoria o no. 
-        bool dirty_bit;      // cambia el curso de algunas operaciones.
-        size_t ant_tag;     // -1 por default, para modo verboso.
-        size_t ant_bloque_ins; //anterior bloque->ins, para modo verboso.        
-    }op_result_t;
-*/
-/*
-    1_ n (ok)                                                                                              //ok
-    2_ id caso : hit = 1, clean_miss = 2a, dirty miss = 2b; (ok result->resultado)                         //ok
-    3_ Indice de cache (0 a S). (S) en hexa                 ()                                //ok??                             
-    4_ cache tag, direccion de la operacion en hexadecimal. (ok addr tag)                                  //ok
-    5_ numero de bloque en el que se opera.                 (no)                                           //ok
-    6_ tag anterior que habia en el bloque, o -1 si no hay. (ok addr tag, antes de escribir)               //ok
-    7_ valid_bit                                            (ok result)                                    //ok
-    8_ dirty bit                                            (ok result)                                    //ok
-    9_ lru local (debo buscar el menor siempre).            (ok funcion cache).(se debe agregar a operar)  //ok
-*/
+
 void simulador_modo_verboso(op_result_t* result, size_t instruccion, size_t asociatividad){
-	//0 2a 36 2feee4 0 -1 0 0 0
-    printf("%ld ", instruccion);                                            //1
+
+    printf("%ld ", instruccion);                                            
     if(result->resultado == hit) printf("%d ", HIT);
     else if(result->resultado == clean_miss) printf("%s ", CLEAN_MISS);     
-    else printf("%s ", DIRTY_MISS);                                         //2
+    else printf("%s ", DIRTY_MISS);                                         
 
-    printf("%lx ", result->direccion.index);                                //3
-    printf("%lx ", result->direccion.tag);                                  //4
-    printf("%ld ", result->op_bloque_off);                                   //5
+    printf("%lx ", result->direccion.index);                                
+    printf("%lx ", result->direccion.tag);                                 
+    printf("%ld ", result->op_bloque_off);                                   
     
-    if(result->valido == 1) printf("%lx ", result->direccion.tag);          //antes result->ant_tag
+    //Para estos casos en los que no se escriben datos, la etiqueta anterior es igual a la actual.
+    if(result->valido == 1) printf("%lx ", result->direccion.tag);          
     else  printf("-1 ");
 
-    if(result->valido) printf("1 ");                                        //7
+    if(result->valido) printf("1 ");                                       
     else printf("0 ");
 
-    if(result->dirty_bit) printf("1 ");                                     //8
+    if(result->dirty_bit) printf("1 ");                                    
     else printf("0 ");
 
     if(asociatividad > 1)
-        printf("%ld", result->ant_bloque_ins);                            //9
+        printf("%ld", result->ant_bloque_ins);                            
     printf("\n");
 }
 
 //simulador debe recibir estadisticas si solo hace una operacion a la vez.
 void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t instruccion, 
     estadisticas_t* estadisticas){
-//op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t tam, size_t datos);
+
+    if(!sim || !estadisticas) return;
+    
     op_result_t* result = cache_operar(sim->cache, *operacion, direccion, instruccion);
     if(!result) return;
 
@@ -98,11 +79,8 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
         simulador_modo_verboso(result, instruccion, sim->cache->sets->E);
         sim->modo_verb_inicio++; //avanzo inicio junto con la instruccion.
     }
-    //comienzo de operaciones.
 
-
-    // Aca se deberian actualizar las estadisticas totales con lo que devuelva cache_operar
-    //cuando se carga op_result
+    //Aca se actualizan las estadisticas totales con lo que devuelva cache_operar.
     cargar_estadisticas(estadisticas, result);
     free(result);
 }

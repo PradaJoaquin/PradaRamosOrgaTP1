@@ -17,10 +17,11 @@ typedef struct bloque
     size_t ins;  //Guarda la instruccion que usa el bloque (puede ser la linea del archivo).
 }bloque_t;
 
-//------------------------------------TESTEADO--------------------------------------------
+
 void destruir_bloques(bloque_t* bloque, size_t tope);
 
 void cache_destruir_hasta(cache_t* cache, size_t tope);
+
 /*
 *   Dada la cantidad de bloques, crea un vector con los bloques necesarios, inicializados y 
 *   devuelve el puntero al mismo, en caso de fallar devuelve NULL.
@@ -77,6 +78,8 @@ void destruir_bloques(bloque_t* bloque, size_t tope)
 }
 
 void cache_destruir(cache_t* cache){
+    if(!cache) return;
+
     for(size_t i = 0; i < cache->S; i++){
         for(size_t k = 0; k < cache->sets[i].E; k++){
             free(cache->sets[i].bloques[k].data);
@@ -90,7 +93,6 @@ void cache_destruir(cache_t* cache){
 
 /*
 *   Desrtuye hasta la posicion indicada por max, si se desea destruir todo, debe pasarse la cantidad de sets.
-**  Se implemento de esta forma para manejar los errores de memoria al crear, optimizando la reutilizacion de codigo.
 */
 void cache_destruir_hasta(cache_t* cache, size_t tope)
 {
@@ -111,7 +113,7 @@ void cache_destruir_hasta(cache_t* cache, size_t tope)
     free(cache->sets); 
     free(cache);      
 } 
-//----------------------------------------------------------------------------------------
+
 
 /*
 *   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
@@ -123,12 +125,12 @@ bloque_t* encontrar_LRU(bloque_t* bloques, size_t tope)
 
     for (size_t i = 0; i < tope; ++i)
     {
-        if(!bloques[i].es_valido){ // Si encuentra un bloque no valido, entonces lo devulve
+        if(!bloques[i].es_valido){      //Si encuentra un bloque no valido, entonces lo devulve.
             return &bloques[i];
         }
         if(pos_menor == -1 || bloques[i].ins < ins_menor){
-            ins_menor = bloques[i].ins; //guardo la menor instruccion.
-            pos_menor = i;   //guardo el puntero del bloque en el auxiliar.
+            ins_menor = bloques[i].ins;  //guardo la menor instruccion.
+            pos_menor = i;              //guardo el puntero del bloque en el auxiliar.
         }
     }
     return &bloques[pos_menor]; //puntero al bloque.
@@ -153,9 +155,10 @@ void configurar_remplazo(bloque_t* remplazo, char op, addr_t addr, size_t instru
     }
 }
 
-//warning datos sin usar.
-//debo capturar la instruccion anterior que tenia el bloque, antes de actualizarlo, para el modo verboso.
+
 op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccion){
+    
+    if(!cache) return NULL;
     
     op_result_t* result = malloc(sizeof(op_result_t));
     if(!result) return NULL;
@@ -177,12 +180,10 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
             
             if(op == ESCRITURA) set.bloques[i].dirty_bit = true;
             
-            //set.bloques[i].es_valido = true; //el bloque ahora es valido. 
             result->resultado = hit;
             result->valido = set.bloques[i].es_valido;
             return result;
         }
-        //set.bloques[i].es_valido = true; //el bloque ahora es valido. 
     }
     // MISS
     bloque_t* remplazo = encontrar_LRU(set.bloques, set.E);

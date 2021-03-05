@@ -8,25 +8,6 @@
 #include "mensajes.h"
 #include "simulador.h"
 
-/* 
-	./cachesim adpcm.xex 2048 2 64 -v 0 15000
-	2-way, 64 sets, size = 2KB		            //OK
-	loads 65672 stores 34328 total 100000		//OK
-	rmiss 515 wmiss 179 total 694				//ERROR
-	dirty rmiss 158 dirty wmiss 11				//ERROR
-	bytes read 11104 bytes written 2704			//ERROR
-	read time 132972 write time 53328			//ERROR
-	miss rate 0.006940
-
-  ./cachesim adpcm.xex 4096 1 256 -v 0 10000
-  	direct-mapped, 256 sets, size = 4KB
-	loads 65672 stores 34328 total 100000
-	rmiss 679 wmiss 419 total 1098
-	dirty rmiss 197 dirty wmiss 390
-	bytes read 17568 bytes written 9392
-	read time 153272 write time 115228
-	miss rate 0.010980
-*/
 
 enum parametros{
 	_,
@@ -62,16 +43,10 @@ int sig_posision_valida(char** parametros, int actual){
 void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estadisticas, size_t instruccion) {
 	int pos_operacion = sig_posision_valida(parametros, 0);
 	int pos_direccion = sig_posision_valida(parametros, pos_operacion);
-	//int pos_tamanio = sig_posision_valida(parametros, pos_direccion);
-	//int pos_datos = sig_posision_valida(parametros, pos_tamanio);
 
 	char* operacion = parametros[pos_operacion];
     size_t direccion = strtoul(parametros[pos_direccion], NULL, 16);
-    //int tamanio = atoi(parametros[pos_tamanio]);
-    //size_t datos = strtoul(parametros[pos_datos], NULL, 16);
-//	size_t instruccion = strtoul(inst, NULL, 16); 	//???, debe almacenar la linea del archivo 
 
-//simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos, estadisticas_t* estadisticas);
 	simulador_operar(sim, operacion, direccion, instruccion, estadisticas);
 }
 

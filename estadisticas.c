@@ -1,6 +1,6 @@
 #include "estadisticas.h"
 
-//OK
+
 size_t calcular_readtime(estadisticas_t* estadisticas){
 	return estadisticas->lecturas +  ((estadisticas->rmiss + estadisticas->dirty_rmiss) * PENALTY);
 }
