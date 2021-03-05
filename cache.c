@@ -118,7 +118,7 @@ void cache_destruir_hasta(cache_t* cache, size_t tope)
 /*
 *   Dado una matriz cache devuelve el bloque menos usado del set (local), siempre devuelve uno. 
 */
-bloque_t* encontrar_LRU(bloque_t* bloques, size_t tope)
+bloque_t* encontrar_LRU(bloque_t* bloques, size_t tope, size_t* extra)
 {
     size_t ins_menor; //todas son positivas.
     long int pos_menor = -1;
@@ -126,9 +126,11 @@ bloque_t* encontrar_LRU(bloque_t* bloques, size_t tope)
     for (size_t i = 0; i < tope; ++i)
     {
         if(!bloques[i].es_valido){      //Si encuentra un bloque no valido, entonces lo devulve.
+            *extra = i;
             return &bloques[i];
         }
         if(pos_menor == -1 || bloques[i].ins < ins_menor){
+            *extra = i;
             ins_menor = bloques[i].ins;  //guardo la menor instruccion.
             pos_menor = i;              //guardo el puntero del bloque en el auxiliar.
         }
@@ -177,6 +179,7 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
             result->ant_bloque_ins = set.bloques[i].ins; //para el modo verboso, guardo el viejo
             set.bloques[i].ins = instruccion;
             result->dirty_bit = set.bloques[i].dirty_bit;
+            result->op_bloque_off = i;
             
             if(op == ESCRITURA) set.bloques[i].dirty_bit = true;
             
@@ -186,10 +189,12 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
         }
     }
     // MISS
-    bloque_t* remplazo = encontrar_LRU(set.bloques, set.E);
+    size_t pos_bloque = 0;
+    bloque_t* remplazo = encontrar_LRU(set.bloques, set.E, &pos_bloque);
     result->valido = remplazo->es_valido;
     result->dirty_bit = remplazo->dirty_bit;
     result->ant_bloque_ins = 0;
+    result->op_bloque_off = pos_bloque;
 
     if(!remplazo->es_valido || !remplazo->dirty_bit){
         // Clean cache miss
