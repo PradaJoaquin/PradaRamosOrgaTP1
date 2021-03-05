@@ -47,7 +47,7 @@ void imprimir_estadisticas(estadisticas_t* estadisticas, size_t sets, size_t E, 
 	if(E == 1) printf("Direct-mapped, ");
 	else printf("%ld-way, ", E);
 	printf("%ld sets, size = %ldKB \n", sets, tamanio_cache/KB);
-	printf("Loads: %ld stores: %ld total: %ld \n", estadisticas->lecturas, estadisticas->escrituras, estadisticas->lecturas + estadisticas->escrituras);
+	printf("Loads: %ld stores: %ld total: %ld \n", estadisticas->lecturas, estadisticas->escrituras, estadisticas->lecturas + estadisticas->escrituras );
 	printf("rmiss: %ld, wmiss: %ld total: %ld\n", estadisticas->rmiss, estadisticas->wmiss, estadisticas->rmiss + estadisticas->wmiss);
 	printf("dirty rmis: %ld dirty wmiss: %ld \n", estadisticas->dirty_rmiss, estadisticas->dirty_wmiss);
 	printf("bytes read: %ld bytes written: %ld \n", calcular_bytes_read(estadisticas, tamanio_bloque), calcular_bytes_written(estadisticas, tamanio_bloque) );
@@ -75,4 +75,15 @@ void cargar_estadisticas(estadisticas_t* estadisticas, op_result_t* op_result)
 		if(escritura) estadisticas->dirty_wmiss++;
 		else estadisticas->dirty_rmiss++;
 	}
+}
+
+void inicializar_estadisticas(estadisticas_t* estadisticas)
+{
+	if(!estadisticas) return;
+	estadisticas->lecturas = 0;
+	estadisticas->escrituras = 0;
+	estadisticas->rmiss = 0;
+	estadisticas->wmiss = 0;
+	estadisticas->dirty_rmiss = 0;
+	estadisticas->dirty_wmiss = 0;
 }

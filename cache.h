@@ -25,7 +25,6 @@ typedef struct cache
 }cache_t;
 
 
-
 /*
 *	Dado los argumentos del programa, crea una matriz cache inicializada y devuelve su puntero
 * 	o NULL en caso de que no se pueda crear.

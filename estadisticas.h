@@ -23,6 +23,7 @@ typedef struct estadisticas
 *  capacidad cache = S x E x Unidad Datos.
 */
 
+void inicializar_estadisticas(estadisticas_t* estadisticas);
 /*
 *	Recibe la operacion procesada y carga los resultados en la estadistica pasada por parametro.
 */

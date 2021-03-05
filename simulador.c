@@ -13,7 +13,8 @@
 struct simulador
 {
     cache_t* cache;
-    size_t modo_verb_restante;
+    size_t modo_verb_inicio;
+    size_t modo_verb_final;
 };
 
 simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_t cache_sets, size_t ini, size_t fin){
@@ -26,7 +27,9 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
         free(sim);
         return NULL;
     }
-    sim->modo_verb_restante = fin - ini;
+    //sim->modo_verb_restante = fin - ini; //ERROR no empieza desde inicio si no es 0.
+    sim->modo_verb_final = fin;
+    sim->modo_verb_inicio = ini;
     return sim;
 }
 
@@ -35,19 +38,6 @@ void simulador_destruir(simulador_t* sim){
     free(sim);
 }
 
-/*
-    typedef struct op_result
-    {
-        char operacion;         // w o r
-        resultados_t resultado;// Hit, clean miss o dirty miss.
-        addr_t direccion;     // tag, indice
-        size_t instruccion;  // podemos guardar aca la linea del archivo.
-        bool valido;        // Indica si se cargo un dato en la memoria o no. 
-        bool dirty_bit;    // cambia el curso de algunas operaciones. 
-        size_t ant_tag;   // -1 por default, para modo verboso.
-        size-t ant_bloque_ins; //anterior bloque->ins, para modo verboso.
-    }op_result_t;
-*/
 
 /*
     1_ n (ok)
@@ -84,9 +74,9 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
     op_result_t* result = cache_operar(sim->cache, *operacion, direccion, instruccion);
     if(!result) return;
 
-    if(sim->modo_verb_restante > 0){
+    if(instruccion == sim->modo_verb_inicio && instruccion <= sim->modo_verb_final){
         simulador_modo_verboso(result, instruccion);
-        sim->modo_verb_restante--;
+        sim->modo_verb_inicio++; //avanzo inicio junto con isntruccion.
     }
     //comienzo de operaciones.
 

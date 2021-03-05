@@ -39,7 +39,7 @@ int sig_posision_valida(char** parametros, int actual){
 	return -1;
 }
 
-void procesar_comando(char** parametros, char* inst, simulador_t* sim, estadisticas_t* estadisticas) {
+void procesar_comando(char** parametros, simulador_t* sim, estadisticas_t* estadisticas, size_t instruccion) {
 	int pos_operacion = sig_posision_valida(parametros, 0);
 	int pos_direccion = sig_posision_valida(parametros, pos_operacion);
 	//int pos_tamanio = sig_posision_valida(parametros, pos_direccion);
@@ -49,7 +49,8 @@ void procesar_comando(char** parametros, char* inst, simulador_t* sim, estadisti
     size_t direccion = strtoul(parametros[pos_direccion], NULL, 16);
     //int tamanio = atoi(parametros[pos_tamanio]);
     //size_t datos = strtoul(parametros[pos_datos], NULL, 16);
-	size_t instruccion = strtoul(inst, NULL, 16);
+//	size_t instruccion = strtoul(inst, NULL, 16); 	//???, debe almacenar la linea del archivo 
+
 //simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_t tam, size_t datos, estadisticas_t* estadisticas);
 	simulador_operar(sim, operacion, direccion, instruccion, estadisticas);
 }
@@ -61,20 +62,24 @@ void eliminar_fin_linea(char* linea) {
 	}
 }
 
-void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim) {
+void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim, argumentos_t* args) {
 	char* linea = NULL;
 	size_t c = 0;
 	estadisticas_t estadisticas;
+	inicializar_estadisticas(&estadisticas);
 
+	size_t instruccion = 0;
 	while (getline(&linea, &c, archivo_de_trazas) > 0) {
 		eliminar_fin_linea(linea);
 		char** campos = split(linea, ':');
 		char** parametros = split(campos[1], ' ');
-		procesar_comando(parametros, campos[0], sim, &estadisticas);
+		procesar_comando(parametros, sim, &estadisticas, instruccion);
 		free_strv(parametros);
-		free_strv(campos);
+		free_strv(campos);	
 	}
 	free(linea);
+
+	imprimir_estadisticas(&estadisticas, args->num_sets, args->asociatividad, args->tam_cache);
 }
 
 bool es_potencia_de_2(double numero) {
@@ -136,7 +141,7 @@ int main(int argc, char** argv) {
 
 	simulador_t* sim = simulador_crear(args.tam_cache, args.asociatividad, args.num_sets, args.ini, args.fin);
     
-    procesar_entrada(archivo_trazas, sim);
+    procesar_entrada(archivo_trazas, sim, &args);
 	simulador_destruir(sim);
     fclose(archivo_trazas);
 	return 0;
