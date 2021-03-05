@@ -20,14 +20,15 @@ typedef struct addr
 
 typedef struct op_result
 {
-    char operacion; 		// w o r
-    resultados_t resultado;// Hit, clean miss o dirty miss.
-    addr_t direccion;	  // tag, indice?
-    size_t instruccion;  // podemos guardar aca la linea del archivo.
-    bool valido; 		// Indica si se cargo un dato en la memoria o no. 
-    bool dirty_bit;    // cambia el curso de algunas operaciones.
-    size_t ant_tag;   // -1 por default, para modo verboso.
-    size_t ant_bloque_ins; //anterior bloque->ins, para modo verboso.        
+    char operacion; 		  // w o r
+    resultados_t resultado;  // Hit, clean miss o dirty miss.
+    addr_t direccion;	    // tag, indice?
+    size_t instruccion;    // podemos guardar aca la linea del archivo.
+    bool valido; 		  // Indica si se cargo un dato en la memoria o no. 
+    bool dirty_bit;      // cambia el curso de algunas operaciones.
+    size_t ant_tag;     // -1 por default, para modo verboso.
+    size_t ant_bloque_ins; //anterior bloque->ins, para modo verboso.  
+    size_t op_bloque_off; //indica el numero de bloque en el que se realizo la operacion.   
 }op_result_t;
 
 #endif

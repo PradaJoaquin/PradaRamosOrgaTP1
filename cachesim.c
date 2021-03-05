@@ -8,6 +8,26 @@
 #include "mensajes.h"
 #include "simulador.h"
 
+/* 
+	./cachesim adpcm.xex 2048 2 64 -v 0 15000
+	2-way, 64 sets, size = 2KB		            //OK
+	loads 65672 stores 34328 total 100000		//OK
+	rmiss 515 wmiss 179 total 694				//ERROR
+	dirty rmiss 158 dirty wmiss 11				//ERROR
+	bytes read 11104 bytes written 2704			//ERROR
+	read time 132972 write time 53328			//ERROR
+	miss rate 0.006940
+
+  ./cachesim adpcm.xex 4096 1 256 -v 0 10000
+  	direct-mapped, 256 sets, size = 4KB
+	loads 65672 stores 34328 total 100000
+	rmiss 679 wmiss 419 total 1098
+	dirty rmiss 197 dirty wmiss 390
+	bytes read 17568 bytes written 9392
+	read time 153272 write time 115228
+	miss rate 0.010980
+*/
+
 enum parametros{
 	_,
 	ruta,
@@ -76,6 +96,7 @@ void procesar_entrada(FILE* archivo_de_trazas, simulador_t* sim, argumentos_t* a
 		procesar_comando(parametros, sim, &estadisticas, instruccion);
 		free_strv(parametros);
 		free_strv(campos);	
+		instruccion++;
 	}
 	free(linea);
 

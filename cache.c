@@ -19,7 +19,6 @@ typedef struct bloque
     size_t ins;  //Guarda la instruccion que usa el bloque (puede ser la linea del archivo).
 }bloque_t;
 
-
 //------------------------------------TESTEADO--------------------------------------------
 void destruir_bloques(bloque_t* bloque, size_t tope);
 
@@ -171,18 +170,19 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
 
     set_t set = cache->sets[addr.index];
     for(size_t i = 0; i < set.E; i++){
+        
         if(set.bloques[i].es_valido && set.bloques[i].tag == addr.tag){
             // HIT
-            result->ant_bloque_ins = set.bloques[i].ins; //para el modo verboso.
+            result->ant_bloque_ins = set.bloques[i].ins; //para el modo verboso, guardo el viejo
             set.bloques[i].ins = instruccion;
-
-            if(op == ESCRITURA){
-                set.bloques[i].dirty_bit = true;
-            }
-
+            
+            if(op == ESCRITURA) set.bloques[i].dirty_bit = true;
+            
+            //set.bloques[i].valid_bit = true; //el bloque ahora es valido. 
             result->resultado = hit;
             return result;
         }
+        set.bloques[i].es_valido = true; //el bloque ahora es valido. 
     }
     // MISS
     bloque_t* remplazo = encontrar_LRU(set.bloques, set.E);
