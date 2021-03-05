@@ -176,14 +176,19 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
             
             if(op == ESCRITURA) set.bloques[i].dirty_bit = true;
             
-            //set.bloques[i].valid_bit = true; //el bloque ahora es valido. 
+            //set.bloques[i].es_valido = true; //el bloque ahora es valido. 
             result->resultado = hit;
+            result->valido = set.bloques[i].es_valido;
+            result->dirty_bit = set.bloques[i].dirty_bit;
             return result;
         }
-        set.bloques[i].es_valido = true; //el bloque ahora es valido. 
+        //set.bloques[i].es_valido = true; //el bloque ahora es valido. 
     }
     // MISS
     bloque_t* remplazo = encontrar_LRU(set.bloques, set.E);
+    result->valido = remplazo->es_valido;
+    result->dirty_bit = remplazo->dirty_bit;
+
     if(!remplazo->es_valido || !remplazo->dirty_bit){
         // Clean cache miss
         configurar_remplazo(remplazo, op, addr, instruccion);
