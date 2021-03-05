@@ -173,13 +173,13 @@ op_result_t* cache_operar(cache_t* cache, char op, size_t dir, size_t instruccio
             // HIT
             result->ant_bloque_ins = set.bloques[i].ins; //para el modo verboso, guardo el viejo
             set.bloques[i].ins = instruccion;
+            result->dirty_bit = set.bloques[i].dirty_bit;
             
             if(op == ESCRITURA) set.bloques[i].dirty_bit = true;
             
             //set.bloques[i].es_valido = true; //el bloque ahora es valido. 
             result->resultado = hit;
             result->valido = set.bloques[i].es_valido;
-            result->dirty_bit = set.bloques[i].dirty_bit;
             return result;
         }
         //set.bloques[i].es_valido = true; //el bloque ahora es valido. 
