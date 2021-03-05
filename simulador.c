@@ -13,6 +13,7 @@
 struct simulador
 {
     cache_t* cache;
+    size_t cache_cant_sets;
     size_t modo_verb_inicio;
     size_t modo_verb_final;
 };
@@ -30,6 +31,7 @@ simulador_t* simulador_crear(size_t cache_tam, size_t cache_asociatividad, size_
 
     sim->modo_verb_final = fin;
     sim->modo_verb_inicio = ini;
+    sim->cache_cant_sets = cache_sets;
     return sim;
 }
 
@@ -76,7 +78,7 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
     if(!result) return;
 
     if(instruccion == sim->modo_verb_inicio && instruccion <= sim->modo_verb_final && sim->modo_verb_final != 0 ){
-        simulador_modo_verboso(result, instruccion, sim->cache->sets->E);
+        simulador_modo_verboso(result, instruccion, sim->cache_cant_sets);
         sim->modo_verb_inicio++; //avanzo inicio junto con la instruccion.
     }
 

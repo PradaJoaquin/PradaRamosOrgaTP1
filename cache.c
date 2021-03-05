@@ -17,6 +17,18 @@ typedef struct bloque
     size_t ins;  //Guarda la instruccion que usa el bloque (puede ser la linea del archivo).
 }bloque_t;
 
+typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
+{
+    size_t E; 			 // Cantidad de bloques = "E".
+	bloque_t* bloques; 	
+}set_t;
+
+typedef struct cache
+{
+    size_t S;   // Parametro "S" cantidad de sets.
+    set_t* sets;
+}cache_t;
+
 
 void destruir_bloques(bloque_t* bloque, size_t tope);
 

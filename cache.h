@@ -8,21 +8,6 @@
 #define PENALTY 100 
 
 typedef struct cache cache_t;
-typedef struct bloque bloque_t;
-
-
-typedef struct set //fila de bloques, la cantidad de bloques queda definida por el archivo
-{
-    size_t E; 			 // Cantidad de bloques = "E".
-	bloque_t* bloques; 	
-}set_t;
-
-typedef struct cache
-{
-    size_t S;   // Parametro "S" cantidad de sets.
-    set_t* sets;
-}cache_t;
-
 
 /*
 *	Pre: los parametros fueron validados de antemano.
