@@ -96,7 +96,7 @@ void simulador_operar(simulador_t* sim, char* operacion, size_t direccion, size_
     if(!result) return;
 
     if(instruccion == sim->modo_verb_inicio && instruccion <= sim->modo_verb_final && sim->modo_verb_final != 0 ){
-        simulador_modo_verboso(result, instruccion, sim->cache_sets);
+        simulador_modo_verboso(result, instruccion, sim->cache_asociatividad);
         sim->modo_verb_inicio++; //avanzo inicio junto con la instruccion.
     }
 
